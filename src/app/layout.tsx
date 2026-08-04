@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Oxanium, Mulish } from "next/font/google";
 import "./globals.css";
 
-const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-heading" });
-const mulish = Mulish({ subsets: ["latin"], variable: "--font-body" });
+const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-oxanium" });
+const mulish = Mulish({ subsets: ["latin"], variable: "--font-mulish" });
 
 export const metadata: Metadata = {
   title: { default: "知念健太 Portfolio", template: "%s | 知念健太 Portfolio" },
