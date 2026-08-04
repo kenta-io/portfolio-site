@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Oxanium, Mulish } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import { Header } from "@/components/layout/Header";
 
 const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-oxanium" });
 const mulish = Mulish({ subsets: ["latin"], variable: "--font-mulish" });

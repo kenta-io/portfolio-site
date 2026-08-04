@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Header() {
+export function Header() {
   return (
     <header className="border-b border-border">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center px-4 md:px-6 lg:px-8">
