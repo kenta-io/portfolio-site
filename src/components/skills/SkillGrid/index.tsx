@@ -2,6 +2,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import type { Skill, SkillCategory } from "@/lib/microcms";
+import { SkillCard } from "@/components/skills/SkillCard";
 
 const CATEGORIES: Array<SkillCategory | "All"> = [
   "All",
@@ -58,12 +59,7 @@ export function SkillGrid({ skills }: SkillGridProps) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
         {filtered.map((skill) => (
-          <div
-            key={skill.id}
-            className="border border-border bg-card p-4 md:p-5"
-          >
-            <span className="font-heading text-sm font-bold">{skill.name}</span>
-          </div>
+          <SkillCard key={skill.id} skill={skill} />
         ))}
       </div>
     </div>
