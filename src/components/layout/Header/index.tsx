@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { Menu } from "@/components/layout/Menu";
 
 const NAV_LINKS = [
   { href: "/skills", label: "Skills" },
@@ -8,6 +12,8 @@ const NAV_LINKS = [
 ];
 
 export function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <header className="border-b border-border">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:px-6 lg:px-8">
@@ -29,7 +35,21 @@ export function Header() {
             </Link>
           ))}
         </nav>
+
+        <button
+          type="button"
+          className="flex h-10 w-10 items-center justify-center text-foreground lg:hidden"
+          aria-expanded={isMobileMenuOpen}
+          aria-label="メニューを開閉する"
+          onClick={() => setIsMobileMenuOpen((value) => !value)}
+        >
+          {isMobileMenuOpen ? "✕" : "☰"}
+        </button>
       </div>
+
+      {isMobileMenuOpen && (
+        <Menu links={NAV_LINKS} onNavigate={() => setIsMobileMenuOpen(false)} />
+      )}
     </header>
   );
 }
