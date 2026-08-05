@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Oxanium, Mulish } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-oxanium" });
 const mulish = Mulish({ subsets: ["latin"], variable: "--font-mulish" });
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
