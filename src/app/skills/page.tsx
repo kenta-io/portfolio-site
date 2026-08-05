@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSkills } from "@/lib/microcms";
+import { SkillGrid } from "@/components/skills/SkillGrid";
 
 export const metadata: Metadata = {
   title: "Skills",
@@ -32,18 +33,7 @@ export default async function SkillsPage() {
 
       <section className="border-b border-border py-14 lg:py-20">
         <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
-            {skills.map((skill) => (
-              <div
-                key={skill.id}
-                className="border border-border bg-card p-4 md:p-5"
-              >
-                <span className="font-heading text-sm font-bold">
-                  {skill.name}
-                </span>
-              </div>
-            ))}
-          </div>
+          <SkillGrid skills={skills} />
         </div>
       </section>
     </>
