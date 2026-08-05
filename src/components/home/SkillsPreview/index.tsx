@@ -13,6 +13,12 @@ const SKILLS_PREVIEW = [
   },
 ];
 
+const STATS = [
+  { value: "3年+", label: "Years Experience" },
+  { value: "50+", label: "Projects Built" },
+  { value: "2", label: "SES Projects" },
+];
+
 export function SkillsPreview() {
   return (
     <section className="border-t border-border py-16 lg:py-24">
@@ -51,6 +57,19 @@ export function SkillsPreview() {
                   </li>
                 ))}
               </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 grid grid-cols-3 gap-4 border-t border-border pt-8 md:gap-6 md:pt-10 lg:mt-10 lg:pt-10">
+          {STATS.map(({ value, label }) => (
+            <div key={label} className="text-center">
+              <div className="font-heading mb-1 text-4xl font-bold text-accent lg:text-5xl">
+                {value}
+              </div>
+              <div className="font-heading text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                {label}
+              </div>
             </div>
           ))}
         </div>
