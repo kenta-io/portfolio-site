@@ -1,3 +1,4 @@
+// ─── Skill ───
 export type SkillCategory =
   "コーディング" | "フロントエンド" | "バックエンド" | "ツール";
 
@@ -170,3 +171,105 @@ const MOCK_SKILLS: Skill[] = [
     order: 15,
   },
 ];
+
+// ─── Blog ───
+export type BlogCategory =
+  | "React"
+  | "Next.js"
+  | "TypeScript"
+  | "Three.js"
+  | "AI活用"
+  | "学習ログ"
+  | "エラー対応";
+
+export type BlogPost = {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: BlogCategory;
+  body: string;
+  publishedAt: string;
+};
+
+const MOCK_BLOG_POSTS: BlogPost[] = [
+  {
+    id: "nextjs-app-router-data-fetching",
+    title: "Next.js App Routerでのデータ取得パターンを整理する",
+    excerpt:
+      "Server ComponentとServer Actionsを使い分けながら、データ取得・再検証の設計をどう考えるかまとめました。",
+    category: "Next.js",
+    publishedAt: "2026-07-15",
+    body: "本文はダミーのプレーンテキストでよい（マークダウン化は7節で行う）。",
+  },
+  {
+    id: "react-custom-hooks",
+    title: "Reactのカスタムフックでロジックを再利用する",
+    excerpt:
+      "フォームや非同期処理まわりで重複しがちなロジックを、カスタムフックとして切り出す際に気をつけていることを整理します。",
+    category: "React",
+    publishedAt: "2026-06-28",
+    body: "本文はダミーのプレーンテキストでよい。",
+  },
+  {
+    id: "typescript-type-guard",
+    title: "TypeScriptの型ガードで実行時の値を安全に絞り込む",
+    excerpt:
+      "外部APIやフォーム入力など、型が保証されない値をzod等でどう検証し、型ガードとして活用するかを実例と共に説明します。",
+    category: "TypeScript",
+    publishedAt: "2026-06-10",
+    body: "本文はダミーのプレーンテキストでよい。",
+  },
+];
+
+export async function getBlogPosts({
+  category,
+  page = 1,
+  limit = 10,
+}: {
+  category?: BlogCategory;
+  page?: number;
+  limit?: number;
+} = {}) {
+  const filtered = category
+    ? MOCK_BLOG_POSTS.filter((post) => post.category === category)
+    : MOCK_BLOG_POSTS;
+  const sorted = [...filtered].sort((a, b) =>
+    a.publishedAt < b.publishedAt ? 1 : -1,
+  );
+  const totalPages = Math.max(1, Math.ceil(sorted.length / limit));
+  const start = (page - 1) * limit;
+
+  return {
+    posts: sorted.slice(start, start + limit),
+    totalPages,
+    total: sorted.length,
+  };
+}
+
+const CATEGORY_SLUGS: Record<BlogCategory, string> = {
+  React: "react",
+  "Next.js": "nextjs",
+  TypeScript: "typescript",
+  "Three.js": "threejs",
+  AI活用: "ai",
+  学習ログ: "learning-log",
+  エラー対応: "error-handling",
+};
+
+export function categoryToSlug(category: BlogCategory): string {
+  return CATEGORY_SLUGS[category];
+}
+
+export function slugToCategory(slug: string): BlogCategory | undefined {
+  return (Object.entries(CATEGORY_SLUGS) as [BlogCategory, string][]).find(
+    ([, value]) => value === slug,
+  )?.[0];
+}
+
+export async function getFeaturedBlogPost(): Promise<BlogPost | null> {
+  const sorted = [...MOCK_BLOG_POSTS].sort((a, b) =>
+    a.publishedAt < b.publishedAt ? 1 : -1,
+  );
+
+  return sorted[0] ?? null;
+}
