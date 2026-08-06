@@ -245,3 +245,23 @@ export async function getBlogPosts({
     total: sorted.length,
   };
 }
+
+const CATEGORY_SLUGS: Record<BlogCategory, string> = {
+  React: "react",
+  "Next.js": "nextjs",
+  TypeScript: "typescript",
+  "Three.js": "threejs",
+  AI活用: "ai",
+  学習ログ: "learning-log",
+  エラー対応: "error-handling",
+};
+
+export function categoryToSlug(category: BlogCategory): string {
+  return CATEGORY_SLUGS[category];
+}
+
+export function slugToCategory(slug: string): BlogCategory | undefined {
+  return (Object.entries(CATEGORY_SLUGS) as [BlogCategory, string][]).find(
+    ([, value]) => value === slug,
+  )?.[0];
+}
