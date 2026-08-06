@@ -3,10 +3,12 @@ import { LuBookOpen } from "react-icons/lu";
 import {
   type BlogCategory,
   getBlogPosts,
+  getFeaturedBlogPost,
   slugToCategory,
 } from "@/lib/microcms";
 import { PostCard } from "@/components/blog/PostCard";
 import { CategoryFilter } from "@/components/blog/CategoryFilter";
+import { FeaturedPost } from "@/components/blog/FeaturedPost";
 
 export const metadata: Metadata = {
   title: "ブログ",
@@ -43,10 +45,16 @@ type BlogPageProps = {
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category: categorySlug } = await searchParams;
   const category = categorySlug ? slugToCategory(categorySlug) : undefined;
-  const [{ posts, total }, counts] = await Promise.all([
+  const [{ posts, total }, counts, featuredPost] = await Promise.all([
     getBlogPosts({ category }),
     getCategoryCounts(),
+    getFeaturedBlogPost(),
   ]);
+
+  const showFeatured = !category || featuredPost?.category === category;
+  const restPosts = showFeatured
+    ? posts.filter((post) => post.id !== featuredPost?.id)
+    : posts;
 
   return (
     <section className="pt-16">
@@ -63,8 +71,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-          {posts.map((post) => (
+        {showFeatured && featuredPost && <FeaturedPost post={featuredPost} />}
+
+        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          {restPosts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

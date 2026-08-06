@@ -265,3 +265,11 @@ export function slugToCategory(slug: string): BlogCategory | undefined {
     ([, value]) => value === slug,
   )?.[0];
 }
+
+export async function getFeaturedBlogPost(): Promise<BlogPost | null> {
+  const sorted = [...MOCK_BLOG_POSTS].sort((a, b) =>
+    a.publishedAt < b.publishedAt ? 1 : -1,
+  );
+
+  return sorted[0] ?? null;
+}
