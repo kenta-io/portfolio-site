@@ -273,3 +273,7 @@ export async function getFeaturedBlogPost(): Promise<BlogPost | null> {
 
   return sorted[0] ?? null;
 }
+
+export async function getBlogPost(id: string): Promise<BlogPost | null> {
+  return MOCK_BLOG_POSTS.find((post) => post.id === id) ?? null;
+}
