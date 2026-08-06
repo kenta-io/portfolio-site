@@ -44,6 +44,12 @@ export async function BlogListView({ categorySlug, page }: BlogListViewProps) {
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 py-14 md:px-6 lg:px-8">
+      {showFeatured && featuredPost && (
+        <div className="mb-8">
+          <FeaturedPost post={featuredPost} />
+        </div>
+      )}
+
       <div className="mb-8 flex flex-col gap-4">
         <CategoryFilter
           activeCategory={category}
@@ -56,9 +62,7 @@ export async function BlogListView({ categorySlug, page }: BlogListViewProps) {
         </span>
       </div>
 
-      {showFeatured && featuredPost && <FeaturedPost post={featuredPost} />}
-
-      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {restPosts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
