@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getSkills } from "@/lib/microcms";
 import { SkillGrid } from "@/components/skills/SkillGrid";
 import { CoreStrengths } from "@/components/skills/CoreStrengths";
+import { CurrentlyLearning } from "@/components/skills/CurrentlyLearning";
 
 export const metadata: Metadata = {
   title: "Skills",
@@ -39,6 +40,8 @@ export default async function SkillsPage() {
       </section>
 
       <CoreStrengths />
+
+      <CurrentlyLearning />
     </>
   );
 }
