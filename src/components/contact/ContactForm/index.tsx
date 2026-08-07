@@ -9,8 +9,17 @@ import {
   INQUIRY_TYPES,
 } from "@/lib/contactSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { ConfirmStep } from "@/components/contact/ConfirmStep";
+import { sendContactEmail } from "@/actions/contact";
+
+type Step = "input" | "confirm" | "complete";
 
 export function ContactForm() {
+  const [step, setStep] = useState<Step>("input");
+  const [confirmedValues, setConfirmedValues] =
+    useState<ContactFormValues | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -21,16 +30,35 @@ export function ContactForm() {
     resolver: zodResolver(contactSchema),
     defaultValues: { inquiryType: "job", agreedToPolicy: false },
   });
-
   const inquiryType = watch("inquiryType");
   const agreedToPolicy = watch("agreedToPolicy");
-
   const inputClassName =
     "w-full border border-border bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-accent/60";
 
+  if (step === "confirm" && confirmedValues) {
+    return (
+      <ConfirmStep
+        values={confirmedValues}
+        isSubmitting={isSubmitting}
+        onBack={() => setStep("input")}
+        onConfirm={async () => {
+          setIsSubmitting(true);
+          const result = await sendContactEmail(confirmedValues);
+          setIsSubmitting(false);
+          if (result.status === "success") {
+            setStep("complete");
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <form
-      onSubmit={handleSubmit((values) => console.log(values))}
+      onSubmit={handleSubmit((values) => {
+        setConfirmedValues(values);
+        setStep("confirm");
+      })}
       noValidate
       className="flex flex-col gap-5 border border-border bg-card p-6 md:p-8"
     >
