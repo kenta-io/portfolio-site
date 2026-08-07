@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { categoryToSlug, type BlogPost } from "@/lib/microcms";
+import {
+  calculateReadTime,
+  categoryToSlug,
+  type BlogPost,
+} from "@/lib/microcms";
 
 type PostCardProps = {
   post: BlogPost;
@@ -37,6 +41,9 @@ export function PostCard({ post }: PostCardProps) {
       </p>
 
       <div className="flex items-center justify-between border-t border-border pt-3">
+        <span className="font-heading text-xs text-muted-foreground">
+          {calculateReadTime(post.body)} min read
+        </span>
         <Link
           href={`/blog/${post.id}`}
           className="font-heading flex items-center gap-1 text-xs text-accent transition-colors hover:text-foreground"
