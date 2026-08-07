@@ -277,3 +277,7 @@ export async function getFeaturedBlogPost(): Promise<BlogPost | null> {
 export async function getBlogPost(id: string): Promise<BlogPost | null> {
   return MOCK_BLOG_POSTS.find((post) => post.id === id) ?? null;
 }
+
+export function calculateReadTime(body: string): number {
+  return Math.max(1, Math.ceil(body.length / 500));
+}

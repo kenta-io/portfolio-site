@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { BlogPost } from "@/lib/microcms";
+import { calculateReadTime, type BlogPost } from "@/lib/microcms";
 
 type FeaturedPostProps = {
   post: BlogPost;
@@ -21,6 +21,9 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
           </span>
           <span className="font-heading text-xs text-muted-foreground">
             {post.publishedAt}
+          </span>
+          <span className="font-heading text-xs text-muted-foreground lg:ml-auto">
+            {calculateReadTime(post.body)} min read
           </span>
         </div>
 

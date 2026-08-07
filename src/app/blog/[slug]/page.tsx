@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPost } from "@/lib/microcms";
+import { calculateReadTime, getBlogPost } from "@/lib/microcms";
 import { renderMarkdown } from "@/lib/markdown";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 
@@ -38,6 +38,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           >
             {post.publishedAt}
           </time>
+          <span className="font-heading text-xs text-muted-foreground">
+            ・{calculateReadTime(post.body)} min read
+          </span>
         </div>
         <h1 className="font-heading mb-6 text-2xl font-bold leading-tight md:text-3xl lg:text-4xl">
           {post.title}
