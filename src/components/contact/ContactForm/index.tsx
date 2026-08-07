@@ -140,6 +140,10 @@ export function ContactForm() {
         />
       </Field>
 
+      <div className="font-heading flex items-center justify-center border border-border py-6 text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        [ Cloudflare Turnstile — 本番実装時に設置 ]
+      </div>
+
       <label className="flex items-start gap-2.5 text-xs text-muted-foreground">
         <input
           type="checkbox"
@@ -166,6 +170,14 @@ export function ContactForm() {
       >
         送信する
       </button>
+
+      <p className="font-heading text-center text-[11px] leading-relaxed text-muted-foreground">
+        ご入力いただいた情報は、お問い合わせへの対応のみに利用します。詳しくは
+        <Link href="/privacy-policy" className="text-accent hover:opacity-80">
+          プライバシーポリシー
+        </Link>
+        をご覧ください。
+      </p>
     </form>
   );
 }
