@@ -3,15 +3,16 @@
 import clsx from "clsx";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useState } from "react";
 import {
   ContactFormValues,
   contactSchema,
   INQUIRY_TYPES,
 } from "@/lib/contactSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { ConfirmStep } from "@/components/contact/ConfirmStep";
 import { sendContactEmail } from "@/actions/contact";
+import { CompleteStep } from "@/components/contact/CompleteStep";
 
 type Step = "input" | "confirm" | "complete";
 
@@ -51,6 +52,10 @@ export function ContactForm() {
         }}
       />
     );
+  }
+
+  if (step === "complete") {
+    return <CompleteStep onReset={() => setStep("input")} />;
   }
 
   return (
