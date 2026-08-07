@@ -18,3 +18,26 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-body), sans-serif;
 }
+
+.prose-blog {
+  font-size: 0.9375rem;
+  line-height: 1.9;
+}
+.prose-blog h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.prose-blog h3 {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-blog p {
+  margin-bottom: 1.25rem;
+  color: var(--color-muted-foreground);
+}

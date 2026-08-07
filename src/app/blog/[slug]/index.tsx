@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPost } from "@/lib/microcms";
+import { renderMarkdown } from "@/lib/markdown";
 
 type BlogDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -21,6 +22,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const post = await getBlogPost(slug);
   if (!post) notFound();
 
+  const { html } = await renderMarkdown(post.body);
+
   return (
     <article className="pt-16">
       <div className="mx-auto max-w-[880px] px-4 py-14 md:px-6 lg:px-8">
@@ -38,9 +41,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         <h1 className="font-heading mb-6 text-2xl font-bold leading-tight md:text-3xl lg:text-4xl">
           {post.title}
         </h1>
-        <p className="text-sm leading-[1.85] text-muted-foreground md:text-base">
-          {post.excerpt}
-        </p>
+        <div
+          className="prose-blog text-foreground"
+          dangerouslySetInnerHTML={{ __html: html }}
+        ></div>
       </div>
     </article>
   );
