@@ -4,6 +4,7 @@ import { SkillGrid } from "@/components/skills/SkillGrid";
 import { CoreStrengths } from "@/components/skills/CoreStrengths";
 import { CurrentlyLearning } from "@/components/skills/CurrentlyLearning";
 import { SkillRadar } from "@/components/skills/SkillRadar";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Skills",
@@ -30,6 +31,10 @@ export default async function SkillsPage() {
     <>
       <section className="relative overflow-hidden border-b border-border pt-16">
         <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6 lg:px-8 lg:py-16">
+          <Breadcrumb
+            items={[{ label: "Home", href: "/" }, { label: "Skills" }]}
+          />
+
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_380px] lg:gap-12">
             <div>
               <div className="font-heading mb-4 text-xs uppercase tracking-[0.32em] text-accent">
@@ -59,7 +64,7 @@ export default async function SkillsPage() {
                 ))}
               </div>
             </div>
-            
+
             <SkillRadar />
           </div>
         </div>
