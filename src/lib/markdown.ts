@@ -4,6 +4,7 @@ import rehypeStringify from "rehype-stringify";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { visit } from "unist-util-visit";
+import rehypePrettyCode from "rehype-pretty-code";
 
 export type TocEntry = {
   id: string;
@@ -44,6 +45,7 @@ export async function renderMarkdown(
         },
       );
     })
+    .use(rehypePrettyCode, { theme: "github-dark" })
     .use(rehypeStringify)
     .process(body);
 
