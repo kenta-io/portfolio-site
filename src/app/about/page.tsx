@@ -1,10 +1,38 @@
 import { Portrait } from "@/components/about/Portrait";
+import { TimelineItem } from "@/components/about/TimelineItem";
 import { SiGithub } from "react-icons/si";
 
 const QUICK_FACTS = [
   { label: "Location", value: "東京都, 日本" },
   { label: "Focus", value: "React / Next.js / TypeScript" },
   { label: "Status", value: "就職活動中" },
+];
+
+const CAREER = [
+  {
+    period: "2023 — 現在",
+    role: "コーダー",
+    company: "HR支援会社（社名非公開）",
+    description:
+      "採用サイト・採用LP制作を担当。主担当として50件以上のサイト制作を担当。SES案件ではNext.js/TypeScriptによるフロントエンド開発、Nest.js/TypeScriptによるバックエンド開発を経験。",
+  },
+  {
+    period: "2022 — 2023",
+    role: "プログラミングスクール",
+    description:
+      "未経験からWeb制作を学び、コーダーとしてのキャリアをスタート。",
+  },
+  {
+    period: "2017 — 2022",
+    role: "海外就労・異業種でのキャリア経験など",
+    description: "海外就労を含む異業種でのキャリアを経験。",
+  },
+  {
+    period: "2013 — 2017",
+    role: "陸上自衛隊",
+    company: "高射特科部隊",
+    description: "ローダー操縦手として勤務。",
+  },
 ];
 
 export default function AboutPage() {
@@ -81,6 +109,24 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="mb-10 md:mb-16">
+            <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase">
+              02 — Career
+            </div>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              職歴
+            </h2>
+          </div>
+          <div>
+            {CAREER.map((item) => (
+              <TimelineItem key={item.period} {...item} />
+            ))}
           </div>
         </div>
       </section>
