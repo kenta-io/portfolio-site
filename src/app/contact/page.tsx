@@ -1,4 +1,6 @@
 import { ContactForm } from "@/components/contact/ContactForm";
+import { ContactSidebar } from "@/components/contact/ContactSidebar";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
 
 const FAQ_ITEMS = [
   {
@@ -16,10 +18,69 @@ const FAQ_ITEMS = [
   { q: "入社可能時期はいつですか？", a: "2026年8月17日より稼働可能です。" },
 ];
 
+const STATS_SUMMARY = [
+  { value: "24h", label: "平均返信時間" },
+  { value: "100%", label: "返信率" },
+  { value: "JST", label: "タイムゾーン" },
+];
+
 export default function ContactPage() {
   return (
     <>
-      <ContactForm />
+      <section className="relative overflow-hidden border-b border-border pt-16">
+        <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6 lg:px-8 lg:py-16">
+          <Breadcrumb
+            items={[{ label: "Home", href: "/" }, { label: "Contact" }]}
+          />
+
+          <div className="max-w-[640px]">
+            <div className="font-heading mb-3 text-xs uppercase tracking-[0.32em] text-accent md:mb-4">
+              Get in Touch
+            </div>
+            <h1 className="font-heading mb-4 text-[40px] font-bold leading-[1.0] md:mb-6 md:text-[64px]">
+              Contact
+            </h1>
+            <p className="text-base leading-[1.85] text-muted-foreground md:text-lg">
+              採用担当・受託案件・技術相談など、お気軽にご連絡ください。React /
+              Next.js /
+              TypeScriptを活かせるポジションやプロジェクトを積極的に探しています。
+            </p>
+          </div>
+
+          <div className="mt-8 flex items-center gap-6 border-t border-border pt-8 md:mt-12 md:gap-10 md:pt-10">
+            {STATS_SUMMARY.map(({ value, label }) => (
+              <div key={label}>
+                <div className="font-heading mb-1 text-2xl font-bold text-accent md:text-3xl">
+                  {value}
+                </div>
+                <div className="font-heading text-[10px] uppercase tracking-[0.2em] text-muted-foreground md:text-xs">
+                  {label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_360px] lg:gap-16">
+            <div>
+              <div className="mb-6 md:mb-8">
+                <div className="font-heading mb-3 text-xs uppercase tracking-[0.32em] text-accent">
+                  01 — Message
+                </div>
+                <h2 className="font-heading text-2xl font-bold md:text-3xl">
+                  メッセージを送る
+                </h2>
+              </div>
+              <ContactForm />
+            </div>
+
+            <ContactSidebar />
+          </div>
+        </div>
+      </section>
 
       <section className="border-t border-border py-14 md:py-20 lg:py-24">
         <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">

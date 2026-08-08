@@ -13,8 +13,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ConfirmStep } from "@/components/contact/ConfirmStep";
 import { sendContactEmail } from "@/actions/contact";
 import { CompleteStep } from "@/components/contact/CompleteStep";
+import { IconType } from "react-icons";
+import {
+  LuBriefcase,
+  LuExternalLink,
+  LuMail,
+  LuMessageSquare,
+} from "react-icons/lu";
 
 type Step = "input" | "confirm" | "complete";
+
+const INQUIRY_ICONS: Record<string, IconType> = {
+  job: LuBriefcase,
+  project: LuExternalLink,
+  chat: LuMessageSquare,
+  other: LuMail,
+};
 
 export function ContactForm() {
   const [step, setStep] = useState<Step>("input");
@@ -72,21 +86,25 @@ export function ContactForm() {
           お問い合わせ種別 *
         </label>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {INQUIRY_TYPES.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setValue("inquiryType", id)}
-              className={clsx(
-                "border py-3 text-xs uppercase tracking-[0.1em] transition-all",
-                inquiryType === id
-                  ? "border-accent/40 bg-accent/10 text-accent"
-                  : "border-border text-muted-foreground",
-              )}
-            >
-              {label}
-            </button>
-          ))}
+          {INQUIRY_TYPES.map(({ id, label }) => {
+            const Icon = INQUIRY_ICONS[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setValue("inquiryType", id)}
+                className={clsx(
+                  "flex flex-col items-center gap-2 border py-3 text-xs uppercase tracking-[0.1em] transition-all",
+                  inquiryType === id
+                    ? "border-accent/40 bg-accent/10 text-accent"
+                    : "border-border text-muted-foreground",
+                )}
+              >
+                <Icon size={15} />
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
