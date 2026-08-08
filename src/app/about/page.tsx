@@ -1,7 +1,8 @@
+import { SiGithub } from "react-icons/si";
+import { Interests } from "@/components/about/Interests";
 import { Philosophy } from "@/components/about/Philosophy";
 import { Portrait } from "@/components/about/Portrait";
 import { TimelineItem } from "@/components/about/TimelineItem";
-import { SiGithub } from "react-icons/si";
 
 const QUICK_FACTS = [
   { label: "Location", value: "東京都, 日本" },
@@ -143,6 +144,20 @@ export default function AboutPage() {
             </h2>
           </div>
           <Philosophy />
+        </div>
+      </section>
+
+      <section className="border-b border-border py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="mb-10 md:mb-16">
+            <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase">
+              04 — Interests
+            </div>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              興味 & 趣味
+            </h2>
+          </div>
+          <Interests />
         </div>
       </section>
     </>
