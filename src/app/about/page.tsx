@@ -3,6 +3,7 @@ import { Interests } from "@/components/about/Interests";
 import { Philosophy } from "@/components/about/Philosophy";
 import { Portrait } from "@/components/about/Portrait";
 import { TimelineItem } from "@/components/about/TimelineItem";
+import Link from "next/link";
 
 const QUICK_FACTS = [
   { label: "Location", value: "東京都, 日本" },
@@ -158,6 +159,34 @@ export default function AboutPage() {
             </h2>
           </div>
           <Interests />
+        </div>
+      </section>
+
+      <section className="py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="relative overflow-hidden border border-accent/20 bg-accent/[0.03] px-6 py-10 md:px-10 md:py-12 lg:px-12">
+            <div className="absolute top-0 left-0 h-full w-0.5 bg-accent" />
+            <div className="relative flex flex-col gap-7 md:flex-row md:items-center md:justify-between md:gap-10">
+              <div>
+                <div className="font-heading mb-2 text-xs tracking-[0.3em] text-accent uppercase md:mb-3">
+                  採用担当者・HRの方へ
+                </div>
+                <h3 className="font-heading mb-2 text-2xl font-bold md:text-3xl">
+                  一緒に働きませんか？
+                </h3>
+                <p className="text-sm text-muted-foreground md:text-base">
+                  React / Next.js / TypeScript /
+                  コーダーの知見を活かせるポジションを探しています。
+                </p>
+              </div>
+              <Link
+                href="/contact"
+                className="font-heading inline-flex shrink-0 items-center justify-center gap-2 bg-accent px-6 py-3 text-sm font-semibold tracking-[0.15em] text-accent-foreground uppercase transition-opacity hover:opacity-85 md:px-8 md:py-4"
+              >
+                お問い合わせ →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>
