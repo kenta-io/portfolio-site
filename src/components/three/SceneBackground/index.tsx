@@ -1,5 +1,6 @@
 "use client";
 
+import { NetworkScene } from "@/components/three/SceneBackground/NetworkScene";
 import { useSceneQuality } from "@/components/three/SceneBackground/useSceneQuality";
 import { Canvas } from "@react-three/fiber";
 
@@ -19,6 +20,7 @@ export function SceneBackground() {
         gl={{ antialias: true, alpha: false }}
       >
         <color attach="background" args={["#060a12"]} />
+        <NetworkScene />
       </Canvas>
     </div>
   );
