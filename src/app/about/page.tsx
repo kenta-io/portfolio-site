@@ -1,45 +1,89 @@
 import { Portrait } from "@/components/about/Portrait";
 import { SiGithub } from "react-icons/si";
 
+const QUICK_FACTS = [
+  { label: "Location", value: "東京都, 日本" },
+  { label: "Focus", value: "React / Next.js / TypeScript" },
+  { label: "Status", value: "就職活動中" },
+];
+
 export default function AboutPage() {
   return (
-    <section className="border-b border-border pt-16">
-      <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6 md:py-14 lg:px-8 lg:py-16">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_340px] lg:gap-16">
-          <div className="mx-auto w-48 md:w-64 lg:order-2 lg:w-full">
-            <Portrait />
-          </div>
-
-          <div className="lg:order-1">
-            <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase md:mb-4">
-              フロントエンドエンジニア
-            </div>
-            <h1 className="font-heading mb-4 text-[44px] leading-none font-bold md:mb-6 md:text-[56px] lg:text-[72px]">
-              知念健太
-            </h1>
-            <p className="mb-6 max-w-[520px] text-base leading-[1.85] text-muted-foreground md:mb-8 md:text-lg">
-              HTML/CSS・JavaScriptによるコーディング実務に加え、React / Next.js
-              /
-              TypeScriptでのフロントエンド開発、Nest.jsでのバックエンド開発も経験しているフロントエンドエンジニアです。
-            </p>
-
-            <div className="font-heading mb-6 inline-flex items-center gap-2.5 border border-accent/30 px-3 py-1.5 text-xs tracking-[0.22em] text-accent uppercase md:mb-8">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              就職活動中 — Available
+    <>
+      <section className="border-b border-border pt-16">
+        <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6 md:py-14 lg:px-8 lg:py-16">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_340px] lg:gap-16">
+            <div className="mx-auto w-48 md:w-64 lg:order-2 lg:w-full">
+              <Portrait />
             </div>
 
-            <a
-              href="https://github.com/kenta-io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
-            >
-              <SiGithub size={16} />
-              GitHub
-            </a>
+            <div className="lg:order-1">
+              <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase md:mb-4">
+                フロントエンドエンジニア
+              </div>
+              <h1 className="font-heading mb-4 text-[44px] leading-none font-bold md:mb-6 md:text-[56px] lg:text-[72px]">
+                知念健太
+              </h1>
+
+              <div className="font-heading mb-6 inline-flex items-center gap-2.5 border border-accent/30 px-3 py-1.5 text-xs tracking-[0.22em] text-accent uppercase md:mb-8">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                就職活動中 — Available
+              </div>
+
+              <a
+                href="https://github.com/kenta-io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+              >
+                <SiGithub size={16} />
+                GitHub
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section className="border-b border-border py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="mb-10 md:mb-16">
+            <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase">
+              01 — Profile
+            </div>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              自己紹介
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_320px] lg:gap-16">
+            <div className="space-y-5 md:space-y-6">
+              <p className="text-base leading-[1.85] text-muted-foreground md:text-lg">
+                プログラミングスクールでWeb開発を学び、2023年よりコーダーとしてキャリアをスタートしました。現在はコーダーとして数十件のサイト制作に携わるかたわら、SES案件としてNext.js／TypeScriptによるフロントエンド開発、Nest.js／TypeScriptによるバックエンド開発を経験しました。
+              </p>
+              <p className="text-base leading-[1.85] text-muted-foreground md:text-lg">
+                それ以前は陸上自衛隊や海外就労、異業種でのキャリア経験などを経て、Web業界とは異なるキャリアを歩んできました。異業種での経験を通じて培った現場対応力やコミュニケーション力を活かしながら、実務でのWeb制作に取り組んでいます。
+              </p>
+            </div>
+
+            <div className="border border-border bg-card p-6 md:p-7">
+              <div className="font-heading mb-5 text-xs tracking-[0.28em] text-accent uppercase">
+                Quick Facts
+              </div>
+              {QUICK_FACTS.map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="border-b border-border py-3 last:border-b-0"
+                >
+                  <div className="font-heading mb-0.5 text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+                    {label}
+                  </div>
+                  <div className="text-sm font-medium break-all">{value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
