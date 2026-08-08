@@ -1,3 +1,4 @@
+import { Philosophy } from "@/components/about/Philosophy";
 import { Portrait } from "@/components/about/Portrait";
 import { TimelineItem } from "@/components/about/TimelineItem";
 import { SiGithub } from "react-icons/si";
@@ -128,6 +129,20 @@ export default function AboutPage() {
               <TimelineItem key={item.period} {...item} />
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border py-14 md:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6 lg:px-8">
+          <div className="mb-10 md:mb-16">
+            <div className="font-heading mb-3 text-xs tracking-[0.32em] text-accent uppercase">
+              03 — Philosophy
+            </div>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              考え方
+            </h2>
+          </div>
+          <Philosophy />
         </div>
       </section>
     </>
