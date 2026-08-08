@@ -4,6 +4,7 @@ import { Philosophy } from "@/components/about/Philosophy";
 import { Portrait } from "@/components/about/Portrait";
 import { TimelineItem } from "@/components/about/TimelineItem";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
 
 const QUICK_FACTS = [
   { label: "Location", value: "東京都, 日本" },
@@ -43,6 +44,10 @@ export default function AboutPage() {
     <>
       <section className="border-b border-border pt-16">
         <div className="mx-auto max-w-[1280px] px-4 py-10 md:px-6 md:py-14 lg:px-8 lg:py-16">
+          <Breadcrumb
+            items={[{ label: "Home", href: "/" }, { label: "About" }]}
+          />
+
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_340px] lg:gap-16">
             <div className="mx-auto w-48 md:w-64 lg:order-2 lg:w-full">
               <Portrait />
