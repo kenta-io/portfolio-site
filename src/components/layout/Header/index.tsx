@@ -15,7 +15,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="border-b border-border">
+    <header className="border-b border-border fixed inset-x-0 top-0 z-50 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:px-6 lg:px-8">
         <Link
           href="/"
