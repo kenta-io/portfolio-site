@@ -166,30 +166,137 @@ function sampleKeyframes(t: number) {
 }
 
 function Rig({
+  basePositions,
+  edges,
+  nodeCount,
+  groupRef,
+  linesGeometryRef,
+  pointsGeometryRef,
   linesMaterialRef,
   pointsMaterialRef,
   scrollProgressRef,
+  pointerRef,
 }: {
+  basePositions: Float32Array;
+  edges: Edge[];
+  nodeCount: number;
+  groupRef: RefObject<THREE.Group | null>;
+  linesGeometryRef: RefObject<THREE.BufferGeometry | null>;
+  pointsGeometryRef: RefObject<THREE.BufferGeometry | null>;
   linesMaterialRef: RefObject<THREE.LineBasicMaterial | null>;
   pointsMaterialRef: RefObject<THREE.PointsMaterial | null>;
   scrollProgressRef: RefObject<number>;
+  pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
 }) {
   const { scene } = useThree();
+  const parallax = useRef({ x: 0, y: 0 });
 
-  useFrame((state) => {
+  const livePositions = useRef(new Float32Array(basePositions));
+  const linePositions = useRef(new Float32Array(edges.length * 6));
+
+  const raycaster = useRef(new THREE.Raycaster());
+  const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0));
+  const pointerNDC = useRef(new THREE.Vector2());
+  const mouseWorld = useRef(new THREE.Vector3());
+  const localMouse = useRef(new THREE.Vector3());
+
+  useFrame((state, delta) => {
     const { position, fogDensity, opacity } = sampleKeyframes(
       scrollProgressRef.current,
     );
 
-    state.camera.position.set(...position);
+    parallax.current.x = THREE.MathUtils.damp(
+      parallax.current.x,
+      pointerRef.current.x,
+      3,
+      delta,
+    );
+    parallax.current.y = THREE.MathUtils.damp(
+      parallax.current.y,
+      pointerRef.current.y,
+      3,
+      delta,
+    );
+
+    state.camera.position.set(
+      position[0] + parallax.current.x * 0.3,
+      position[1] - parallax.current.y * 0.2,
+      position[2],
+    );
     state.camera.lookAt(0, 0, 0);
 
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = fogDensity;
     }
+
+    if (pointerRef.current.active && groupRef.current) {
+      pointerNDC.current.set(pointerRef.current.x, -pointerRef.current.y);
+      raycaster.current.setFromCamera(pointerNDC.current, state.camera);
+      const hit = raycaster.current.ray.intersectPlane(
+        groundPlane.current,
+        mouseWorld.current,
+      );
+      if (hit) {
+        localMouse.current.copy(mouseWorld.current);
+        groupRef.current.worldToLocal(localMouse.current);
+      }
+    }
+
+    const live = livePositions.current;
+    for (let i = 0; i < nodeCount; i++) {
+      const bi = i * 3;
+      let px = basePositions[bi];
+      let py = basePositions[bi + 1];
+      let pz = basePositions[bi + 2];
+
+      if (pointerRef.current.active) {
+        const dx = px - localMouse.current.x;
+        const dy = py - localMouse.current.y;
+        const dz = pz - localMouse.current.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < REPULSION_RADIUS && dist > 0.0001) {
+          const falloff = 1 - dist / REPULSION_RADIUS;
+          const push = (falloff * falloff * REPULSION_STRENGTH) / dist;
+          px += dx * push;
+          py += dy * push;
+          pz += dz * push;
+        }
+      }
+      live[bi] = px;
+      live[bi + 1] = py;
+      live[bi + 2] = pz;
+    }
+
+    const lines = linePositions.current;
+    for (let e = 0; e < edges.length; e++) {
+      const [a, b] = edges[e];
+      const li = e * 6;
+      lines[li] = live[a * 3];
+      lines[li + 1] = live[a * 3 + 1];
+      lines[li + 2] = live[a * 3 + 2];
+      lines[li + 3] = live[b * 3];
+      lines[li + 4] = live[b * 3 + 1];
+      lines[li + 5] = live[b * 3 + 2];
+    }
+
+    if (pointsGeometryRef.current) {
+      const attr = pointsGeometryRef.current.attributes.position;
+      (attr.array as Float32Array).set(live);
+      attr.needsUpdate = true;
+    }
+    if (linesGeometryRef.current) {
+      const attr = linesGeometryRef.current.attributes.position;
+      (attr.array as Float32Array).set(lines);
+      attr.needsUpdate = true;
+    }
+
     if (linesMaterialRef.current)
       linesMaterialRef.current.opacity = opacity * 0.5;
     if (pointsMaterialRef.current) pointsMaterialRef.current.opacity = opacity;
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.025;
+    }
   });
 
   return null;
@@ -198,9 +305,11 @@ function Rig({
 export function NetworkScene({
   quality,
   scrollProgressRef,
+  pointerRef,
 }: {
   quality: SceneQuality;
   scrollProgressRef: RefObject<number>;
+  pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
 }) {
   const nodeCount = NODE_COUNT_BY_QUALITY[quality];
   const nodeTexture = useMemo(() => createNodeTexture(), []);
@@ -232,6 +341,9 @@ export function NetworkScene({
     return array;
   }, [basePositions, edges]);
 
+  const groupRef = useRef<THREE.Group>(null);
+  const linesGeometryRef = useRef<THREE.BufferGeometry>(null);
+  const pointsGeometryRef = useRef<THREE.BufferGeometry>(null);
   const linesMaterialRef = useRef<THREE.LineBasicMaterial>(null);
   const pointsMaterialRef = useRef<THREE.PointsMaterial>(null);
 
@@ -239,49 +351,61 @@ export function NetworkScene({
     <>
       <fogExp2 attach="fog" args={[BACKGROUND_COLOR, 0.06]} />
 
-      {POLYHEDRA.map((polyhedron, index) => (
-        <SpinningPolyhedron key={index} {...polyhedron} />
-      ))}
+      <group ref={groupRef}>
+        {POLYHEDRA.map((polyhedron, index) => (
+          <SpinningPolyhedron key={index} {...polyhedron} />
+        ))}
 
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[linePositions, 3]}
+        <lineSegments>
+          <bufferGeometry ref={linesGeometryRef}>
+            <bufferAttribute
+              attach="attributes-position"
+              args={[linePositions, 3]}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial
+            ref={linesMaterialRef}
+            color={ACCENT_COLOR}
+            transparent
+            opacity={0.3}
           />
-        </bufferGeometry>
-        <lineBasicMaterial
-          ref={linesMaterialRef}
-          color={ACCENT_COLOR}
-          transparent
-          opacity={0.3}
-        />
-      </lineSegments>
+        </lineSegments>
 
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[basePositions, 3]}
+        <points>
+          <bufferGeometry ref={pointsGeometryRef}>
+            <bufferAttribute
+              attach="attributes-position"
+              args={[basePositions, 3]}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            ref={pointsMaterialRef}
+            map={nodeTexture}
+            size={0.12}
+            color={ACCENT_COLOR}
+            transparent
+            opacity={0.9}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
           />
-        </bufferGeometry>
-        <pointsMaterial
-          ref={pointsMaterialRef}
-          map={nodeTexture}
-          size={0.12}
-          color={ACCENT_COLOR}
-          transparent
-          opacity={0.9}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </points>
+        </points>
+      </group>
 
       <Rig
+        basePositions={basePositions}
+        edges={edges}
+        nodeCount={nodeCount}
+        groupRef={groupRef}
+        linesGeometryRef={linesGeometryRef}
+        pointsGeometryRef={pointsGeometryRef}
         linesMaterialRef={linesMaterialRef}
         pointsMaterialRef={pointsMaterialRef}
         scrollProgressRef={scrollProgressRef}
+        pointerRef={pointerRef}
       />
     </>
   );
 }
+
+const REPULSION_RADIUS = 1.7;
+const REPULSION_STRENGTH = 1.15;
