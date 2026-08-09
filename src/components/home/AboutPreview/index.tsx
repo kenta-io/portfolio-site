@@ -37,7 +37,7 @@ export function AboutPreview() {
         </div>
 
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_380px] lg:gap-16">
-          <div>
+          <div className=" backdrop-blur-lg p-6 md:p-7">
             <p className="mb-3 text-lg leading-[1.8] md:text-xl">
               HTML/CSS・JavaScriptによるコーディング実務を軸に、React / Next.js
               /
