@@ -4,6 +4,8 @@ import { SiGithub } from "react-icons/si";
 export function HeroSection() {
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden pt-16">
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,rgba(6,10,18,0.94)_0%,rgba(6,10,18,0.94)_100%)] lg:bg-[linear-gradient(to_right,rgba(6,10,18,0.92)_0%,rgba(6,10,18,0.75)_38%,rgba(6,10,18,0)_68%)]" />
+
       <div className="relative mx-auto w-full max-w-[1280px] px-4 py-16 md:px-6 lg:px-8 lg:py-0">
         <div className="max-w-[600px]">
           <div className="font-heading mb-6 inline-flex items-center gap-2.5 border border-accent/30 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-accent">
