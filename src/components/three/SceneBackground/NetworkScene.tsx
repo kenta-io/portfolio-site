@@ -194,6 +194,7 @@ function Rig({
   pulsesMaterialRef,
   scrollProgressRef,
   pointerRef,
+  glitchPulseRef,
 }: {
   network: ReturnType<typeof buildNetwork>;
   nodeCount: number;
@@ -207,6 +208,7 @@ function Rig({
   pulsesMaterialRef: RefObject<THREE.PointsMaterial | null>;
   scrollProgressRef: RefObject<number>;
   pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
+  glitchPulseRef: RefObject<{ timestamp: number }>;
 }) {
   const { scene } = useThree();
   const parallax = useRef({ x: 0, y: 0 });
@@ -221,6 +223,13 @@ function Rig({
   const pointerNDC = useRef(new THREE.Vector2());
   const mouseWorld = useRef(new THREE.Vector3());
   const localMouse = useRef(new THREE.Vector3());
+
+  const accentColor = useRef(new THREE.Color(ACCENT_COLOR));
+  const whiteColor = useRef(new THREE.Color("#ffffff"));
+  const flashColor = useRef(new THREE.Color());
+
+  const lastSeenGlitchTimestamp = useRef(0);
+  const glitchStartClock = useRef(-Infinity);
 
   useFrame((state, delta) => {
     const {
@@ -242,9 +251,24 @@ function Rig({
       delta,
     );
 
+    // グリッチ検知：timestampが変わった瞬間を捉え、そこからの経過時間で強度を減衰させる
+    if (glitchPulseRef.current.timestamp !== lastSeenGlitchTimestamp.current) {
+      lastSeenGlitchTimestamp.current = glitchPulseRef.current.timestamp;
+      glitchStartClock.current = state.clock.elapsedTime;
+    }
+    const glitchAge = state.clock.elapsedTime - glitchStartClock.current;
+    const glitchIntensity =
+      glitchAge >= 0 && glitchAge < GLITCH_DURATION
+        ? 1 - glitchAge / GLITCH_DURATION
+        : 0;
+    const shakeX =
+      glitchIntensity > 0 ? (Math.random() - 0.5) * 0.35 * glitchIntensity : 0;
+    const shakeY =
+      glitchIntensity > 0 ? (Math.random() - 0.5) * 0.35 * glitchIntensity : 0;
+
     state.camera.position.set(
-      position[0] + parallax.current.x * 0.3,
-      position[1] - parallax.current.y * 0.2,
+      position[0] + parallax.current.x * 0.3 + shakeX,
+      position[1] - parallax.current.y * 0.2 + shakeY,
       position[2],
     );
     state.camera.lookAt(0, 0, 0);
@@ -358,15 +382,32 @@ function Rig({
       attr.needsUpdate = true;
     }
 
-    if (linesMaterialRef.current)
-      linesMaterialRef.current.opacity = keyframeOpacity * 0.5 * assemblyFadeIn;
-    if (pointsMaterialRef.current)
-      pointsMaterialRef.current.opacity = keyframeOpacity * assemblyFadeIn;
-    if (pulsesMaterialRef.current)
+    // グリッチのフラッシュ：明るさを一瞬ブーストし、色をアクセント色→白へ寄せる
+    const flashBoost = 1 + glitchIntensity * 0.6;
+    flashColor.current
+      .copy(accentColor.current)
+      .lerp(whiteColor.current, glitchIntensity * 0.85);
+
+    if (linesMaterialRef.current) {
+      linesMaterialRef.current.opacity = Math.min(
+        1,
+        keyframeOpacity * 0.5 * assemblyFadeIn * flashBoost,
+      );
+      linesMaterialRef.current.color.copy(flashColor.current);
+    }
+    if (pointsMaterialRef.current) {
+      pointsMaterialRef.current.opacity = Math.min(
+        1,
+        keyframeOpacity * assemblyFadeIn * flashBoost,
+      );
+      pointsMaterialRef.current.color.copy(flashColor.current);
+    }
+    if (pulsesMaterialRef.current) {
       pulsesMaterialRef.current.opacity = Math.min(
         1,
         keyframeOpacity * 1.4 * assemblyFadeIn,
       );
+    }
 
     if (groupRef.current) {
       groupRef.current.rotation.y += delta * 0.025;
@@ -380,10 +421,12 @@ export function NetworkScene({
   quality,
   scrollProgressRef,
   pointerRef,
+  glitchPulseRef,
 }: {
   quality: SceneQuality;
   scrollProgressRef: RefObject<number>;
   pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
+  glitchPulseRef: RefObject<{ timestamp: number }>;
 }) {
   const nodeCount = NODE_COUNT_BY_QUALITY[quality];
   const pulseCount = PULSE_COUNT_BY_QUALITY[quality];
@@ -488,6 +531,7 @@ export function NetworkScene({
         pulsesMaterialRef={pulsesMaterialRef}
         scrollProgressRef={scrollProgressRef}
         pointerRef={pointerRef}
+        glitchPulseRef={glitchPulseRef}
       />
     </>
   );
@@ -520,3 +564,5 @@ const ASSEMBLY_DURATION = 1.6;
 function easeOutCubic(x: number): number {
   return 1 - Math.pow(1 - x, 3);
 }
+
+const GLITCH_DURATION = 0.35;
