@@ -15,7 +15,7 @@ const SOCIALS = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border py-6 md:py-7">
+    <footer className="border-t border-border py-6 md:py-7 backdrop-blur-lg">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 md:px-6 lg:px-8">
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {FOOTER_LINKS.map(({ href, label }) => (
