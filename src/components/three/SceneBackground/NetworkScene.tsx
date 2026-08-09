@@ -169,22 +169,28 @@ function Rig({
   basePositions,
   edges,
   nodeCount,
+  pulseCount,
   groupRef,
   linesGeometryRef,
   pointsGeometryRef,
+  pulsesGeometryRef,
   linesMaterialRef,
   pointsMaterialRef,
+  pulsesMaterialRef,
   scrollProgressRef,
   pointerRef,
 }: {
   basePositions: Float32Array;
   edges: Edge[];
   nodeCount: number;
+  pulseCount: number;
   groupRef: RefObject<THREE.Group | null>;
   linesGeometryRef: RefObject<THREE.BufferGeometry | null>;
   pointsGeometryRef: RefObject<THREE.BufferGeometry | null>;
+  pulsesGeometryRef: RefObject<THREE.BufferGeometry | null>;
   linesMaterialRef: RefObject<THREE.LineBasicMaterial | null>;
   pointsMaterialRef: RefObject<THREE.PointsMaterial | null>;
+  pulsesMaterialRef: RefObject<THREE.PointsMaterial | null>;
   scrollProgressRef: RefObject<number>;
   pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
 }) {
@@ -193,6 +199,8 @@ function Rig({
 
   const livePositions = useRef(new Float32Array(basePositions));
   const linePositions = useRef(new Float32Array(edges.length * 6));
+  const pulses = useRef(createPulses(edges, pulseCount));
+  const pulsePositions = useRef(new Float32Array(pulseCount * 3));
 
   const raycaster = useRef(new THREE.Raycaster());
   const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0));
@@ -279,6 +287,32 @@ function Rig({
       lines[li + 5] = live[b * 3 + 2];
     }
 
+    // 接続線の上を流れる光のパルス。ループするたびに別の辺へ乗り換える
+    const pulsePos = pulsePositions.current;
+    for (let p = 0; p < pulses.current.length; p++) {
+      const pulse = pulses.current[p];
+      pulse.t += delta * pulse.speed;
+      if (pulse.t > 1) {
+        pulse.t -= 1;
+        pulse.edge = randomEdge(edges);
+      }
+      const [a, b] = pulse.edge;
+      const ai = a * 3;
+      const bi2 = b * 3;
+      const pi = p * 3;
+      pulsePos[pi] = THREE.MathUtils.lerp(live[ai], live[bi2], pulse.t);
+      pulsePos[pi + 1] = THREE.MathUtils.lerp(
+        live[ai + 1],
+        live[bi2 + 1],
+        pulse.t,
+      );
+      pulsePos[pi + 2] = THREE.MathUtils.lerp(
+        live[ai + 2],
+        live[bi2 + 2],
+        pulse.t,
+      );
+    }
+
     if (pointsGeometryRef.current) {
       const attr = pointsGeometryRef.current.attributes.position;
       (attr.array as Float32Array).set(live);
@@ -289,10 +323,17 @@ function Rig({
       (attr.array as Float32Array).set(lines);
       attr.needsUpdate = true;
     }
+    if (pulsesGeometryRef.current) {
+      const attr = pulsesGeometryRef.current.attributes.position;
+      (attr.array as Float32Array).set(pulsePos);
+      attr.needsUpdate = true;
+    }
 
     if (linesMaterialRef.current)
       linesMaterialRef.current.opacity = opacity * 0.5;
     if (pointsMaterialRef.current) pointsMaterialRef.current.opacity = opacity;
+    if (pulsesMaterialRef.current)
+      pulsesMaterialRef.current.opacity = Math.min(1, opacity * 1.4);
 
     if (groupRef.current) {
       groupRef.current.rotation.y += delta * 0.025;
@@ -312,6 +353,7 @@ export function NetworkScene({
   pointerRef: RefObject<{ x: number; y: number; active: boolean }>;
 }) {
   const nodeCount = NODE_COUNT_BY_QUALITY[quality];
+  const pulseCount = PULSE_COUNT_BY_QUALITY[quality];
   const nodeTexture = useMemo(() => createNodeTexture(), []);
   const { basePositions, edges } = useMemo(
     () => buildNetwork(nodeCount),
@@ -340,12 +382,18 @@ export function NetworkScene({
     }
     return array;
   }, [basePositions, edges]);
+  const initialPulsePositions = useMemo(
+    () => new Float32Array(pulseCount * 3),
+    [pulseCount],
+  );
 
   const groupRef = useRef<THREE.Group>(null);
   const linesGeometryRef = useRef<THREE.BufferGeometry>(null);
   const pointsGeometryRef = useRef<THREE.BufferGeometry>(null);
+  const pulsesGeometryRef = useRef<THREE.BufferGeometry>(null);
   const linesMaterialRef = useRef<THREE.LineBasicMaterial>(null);
   const pointsMaterialRef = useRef<THREE.PointsMaterial>(null);
+  const pulsesMaterialRef = useRef<THREE.PointsMaterial>(null);
 
   return (
     <>
@@ -389,17 +437,39 @@ export function NetworkScene({
             blending={THREE.AdditiveBlending}
           />
         </points>
+
+        <points>
+          <bufferGeometry ref={pulsesGeometryRef}>
+            <bufferAttribute
+              attach="attributes-position"
+              args={[initialPulsePositions, 3]}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            ref={pulsesMaterialRef}
+            map={nodeTexture}
+            size={0.22}
+            color="#ffffff"
+            transparent
+            opacity={0.9}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </points>
       </group>
 
       <Rig
         basePositions={basePositions}
         edges={edges}
         nodeCount={nodeCount}
+        pulseCount={pulseCount}
         groupRef={groupRef}
         linesGeometryRef={linesGeometryRef}
         pointsGeometryRef={pointsGeometryRef}
+        pulsesGeometryRef={pulsesGeometryRef}
         linesMaterialRef={linesMaterialRef}
         pointsMaterialRef={pointsMaterialRef}
+        pulsesMaterialRef={pulsesMaterialRef}
         scrollProgressRef={scrollProgressRef}
         pointerRef={pointerRef}
       />
@@ -409,3 +479,22 @@ export function NetworkScene({
 
 const REPULSION_RADIUS = 1.7;
 const REPULSION_STRENGTH = 1.15;
+
+const PULSE_COUNT_BY_QUALITY: Record<SceneQuality, number> = {
+  full: 26,
+  light: 12,
+};
+
+type Pulse = { edge: Edge; t: number; speed: number };
+
+function randomEdge(edges: Edge[]): Edge {
+  return edges[Math.floor(Math.random() * edges.length)];
+}
+
+function createPulses(edges: Edge[], count: number): Pulse[] {
+  return Array.from({ length: count }, () => ({
+    edge: randomEdge(edges),
+    t: Math.random(),
+    speed: THREE.MathUtils.randFloat(0.25, 0.55),
+  }));
+}
