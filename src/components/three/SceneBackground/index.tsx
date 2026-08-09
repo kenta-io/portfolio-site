@@ -20,7 +20,7 @@ export function SceneBackground() {
         gl={{ antialias: true, alpha: false }}
       >
         <color attach="background" args={["#060a12"]} />
-        <NetworkScene />
+        <NetworkScene quality={quality} />
       </Canvas>
     </div>
   );
