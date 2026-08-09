@@ -2,10 +2,12 @@
 
 import { NetworkScene } from "@/components/three/SceneBackground/NetworkScene";
 import { useSceneQuality } from "@/components/three/SceneBackground/useSceneQuality";
+import { useScrollProgress } from "@/components/three/SceneBackground/useScrollProgress";
 import { Canvas } from "@react-three/fiber";
 
 export function SceneBackground() {
   const quality = useSceneQuality();
+  const scrollProgressRef = useScrollProgress();
   const dpr: [number, number] = quality === "full" ? [1, 1.5] : [1, 1];
 
   return (
@@ -20,7 +22,7 @@ export function SceneBackground() {
         gl={{ antialias: true, alpha: false }}
       >
         <color attach="background" args={["#060a12"]} />
-        <NetworkScene quality={quality} />
+        <NetworkScene quality={quality} scrollProgressRef={scrollProgressRef} />
       </Canvas>
     </div>
   );

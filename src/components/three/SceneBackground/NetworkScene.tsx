@@ -1,6 +1,6 @@
-import { useMemo, useRef } from "react";
+import { type RefObject, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { SceneQuality } from "@/components/three/SceneBackground/useSceneQuality";
 import { createNodeTexture } from "@/components/three/SceneBackground/nodeTexture";
 
@@ -120,7 +120,88 @@ function buildNetwork(nodeCount: number) {
   return { basePositions, edges };
 }
 
-export function NetworkScene({ quality }: { quality: SceneQuality }) {
+const BACKGROUND_COLOR = "#060a12";
+
+const CAMERA_KEYFRAMES: {
+  t: number;
+  position: [number, number, number];
+  fogDensity: number;
+  opacity: number;
+}[] = [
+  { t: 0.0, position: [1.6, 0.2, 5.4], fogDensity: 0.045, opacity: 0.95 }, // Hero
+  { t: 0.18, position: [0.3, 0.5, 7.4], fogDensity: 0.085, opacity: 0.3 }, // Skillsへ
+  { t: 0.42, position: [-0.7, -0.3, 8.6], fogDensity: 0.105, opacity: 0.18 }, // Blog
+  { t: 0.68, position: [0.7, -0.5, 8.2], fogDensity: 0.105, opacity: 0.18 }, // About
+  { t: 1.0, position: [0, 0.1, 4.4], fogDensity: 0.05, opacity: 0.5 }, // Contact — 再収束
+];
+
+function sampleKeyframes(t: number) {
+  const clamped = Math.min(1, Math.max(0, t));
+  let start = CAMERA_KEYFRAMES[0];
+  let end = CAMERA_KEYFRAMES[CAMERA_KEYFRAMES.length - 1];
+
+  for (let i = 0; i < CAMERA_KEYFRAMES.length - 1; i++) {
+    if (
+      clamped >= CAMERA_KEYFRAMES[i].t &&
+      clamped <= CAMERA_KEYFRAMES[i + 1].t
+    ) {
+      start = CAMERA_KEYFRAMES[i];
+      end = CAMERA_KEYFRAMES[i + 1];
+      break;
+    }
+  }
+
+  const span = end.t - start.t;
+  const localT = span > 0 ? (clamped - start.t) / span : 0;
+
+  return {
+    position: [
+      THREE.MathUtils.lerp(start.position[0], end.position[0], localT),
+      THREE.MathUtils.lerp(start.position[1], end.position[1], localT),
+      THREE.MathUtils.lerp(start.position[2], end.position[2], localT),
+    ] as [number, number, number],
+    fogDensity: THREE.MathUtils.lerp(start.fogDensity, end.fogDensity, localT),
+    opacity: THREE.MathUtils.lerp(start.opacity, end.opacity, localT),
+  };
+}
+
+function Rig({
+  linesMaterialRef,
+  pointsMaterialRef,
+  scrollProgressRef,
+}: {
+  linesMaterialRef: RefObject<THREE.LineBasicMaterial | null>;
+  pointsMaterialRef: RefObject<THREE.PointsMaterial | null>;
+  scrollProgressRef: RefObject<number>;
+}) {
+  const { scene } = useThree();
+
+  useFrame((state) => {
+    const { position, fogDensity, opacity } = sampleKeyframes(
+      scrollProgressRef.current,
+    );
+
+    state.camera.position.set(...position);
+    state.camera.lookAt(0, 0, 0);
+
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = fogDensity;
+    }
+    if (linesMaterialRef.current)
+      linesMaterialRef.current.opacity = opacity * 0.5;
+    if (pointsMaterialRef.current) pointsMaterialRef.current.opacity = opacity;
+  });
+
+  return null;
+}
+
+export function NetworkScene({
+  quality,
+  scrollProgressRef,
+}: {
+  quality: SceneQuality;
+  scrollProgressRef: RefObject<number>;
+}) {
   const nodeCount = NODE_COUNT_BY_QUALITY[quality];
   const nodeTexture = useMemo(() => createNodeTexture(), []);
   const { basePositions, edges } = useMemo(
@@ -151,8 +232,13 @@ export function NetworkScene({ quality }: { quality: SceneQuality }) {
     return array;
   }, [basePositions, edges]);
 
+  const linesMaterialRef = useRef<THREE.LineBasicMaterial>(null);
+  const pointsMaterialRef = useRef<THREE.PointsMaterial>(null);
+
   return (
     <>
+      <fogExp2 attach="fog" args={[BACKGROUND_COLOR, 0.06]} />
+
       {POLYHEDRA.map((polyhedron, index) => (
         <SpinningPolyhedron key={index} {...polyhedron} />
       ))}
@@ -164,7 +250,12 @@ export function NetworkScene({ quality }: { quality: SceneQuality }) {
             args={[linePositions, 3]}
           />
         </bufferGeometry>
-        <lineBasicMaterial color={ACCENT_COLOR} transparent opacity={0.3} />
+        <lineBasicMaterial
+          ref={linesMaterialRef}
+          color={ACCENT_COLOR}
+          transparent
+          opacity={0.3}
+        />
       </lineSegments>
 
       <points>
@@ -175,6 +266,7 @@ export function NetworkScene({ quality }: { quality: SceneQuality }) {
           />
         </bufferGeometry>
         <pointsMaterial
+          ref={pointsMaterialRef}
           map={nodeTexture}
           size={0.12}
           color={ACCENT_COLOR}
@@ -184,6 +276,12 @@ export function NetworkScene({ quality }: { quality: SceneQuality }) {
           blending={THREE.AdditiveBlending}
         />
       </points>
+
+      <Rig
+        linesMaterialRef={linesMaterialRef}
+        pointsMaterialRef={pointsMaterialRef}
+        scrollProgressRef={scrollProgressRef}
+      />
     </>
   );
 }
