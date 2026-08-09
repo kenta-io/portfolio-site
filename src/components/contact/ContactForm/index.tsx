@@ -186,7 +186,7 @@ export function ContactForm() {
         type="submit"
         className="font-heading w-full bg-accent py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-opacity hover:opacity-85 md:py-4"
       >
-        送信する
+        確認画面へ進む
       </button>
 
       <p className="font-heading text-center text-[11px] leading-relaxed text-muted-foreground">
