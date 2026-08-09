@@ -59,14 +59,19 @@ function SpinningPolyhedron({
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     if (!meshRef.current) return;
     meshRef.current.rotation.x += delta * speed;
     meshRef.current.rotation.y += delta * speed * 0.6;
+
+    const assemblyT = easeOutCubic(
+      Math.min(1, state.clock.elapsedTime / ASSEMBLY_DURATION),
+    );
+    meshRef.current.scale.setScalar(scale * assemblyT);
   });
 
   return (
-    <mesh ref={meshRef} position={position} scale={scale}>
+    <mesh ref={meshRef} position={position} scale={0}>
       {geometry === "icosahedron" && <icosahedronGeometry args={[1, 0]} />}
       {geometry === "octahedron" && <octahedronGeometry args={[1, 0]} />}
       {geometry === "tetrahedron" && <tetrahedronGeometry args={[1, 0]} />}
@@ -89,6 +94,7 @@ type Edge = [number, number];
 
 function buildNetwork(nodeCount: number) {
   const basePositions = new Float32Array(nodeCount * 3);
+  const scatterPositions = new Float32Array(nodeCount * 3);
   const points: THREE.Vector3[] = [];
 
   for (let i = 0; i < nodeCount; i++) {
@@ -99,6 +105,16 @@ function buildNetwork(nodeCount: number) {
     basePositions[i * 3 + 1] = y;
     basePositions[i * 3 + 2] = z;
     points.push(new THREE.Vector3(x, y, z));
+
+    const direction = new THREE.Vector3(
+      THREE.MathUtils.randFloatSpread(2),
+      THREE.MathUtils.randFloatSpread(2),
+      THREE.MathUtils.randFloatSpread(2),
+    ).normalize();
+    const distance = 9 + Math.random() * 7;
+    scatterPositions[i * 3] = x + direction.x * distance;
+    scatterPositions[i * 3 + 1] = y + direction.y * distance;
+    scatterPositions[i * 3 + 2] = z + direction.z * distance;
   }
 
   const MAX_DISTANCE = 1.8;
@@ -117,7 +133,7 @@ function buildNetwork(nodeCount: number) {
     }
   }
 
-  return { basePositions, edges };
+  return { basePositions, scatterPositions, edges };
 }
 
 const BACKGROUND_COLOR = "#060a12";
@@ -128,11 +144,11 @@ const CAMERA_KEYFRAMES: {
   fogDensity: number;
   opacity: number;
 }[] = [
-  { t: 0.0, position: [1.6, 0.2, 5.4], fogDensity: 0.045, opacity: 0.95 }, // Hero
-  { t: 0.18, position: [0.3, 0.5, 7.4], fogDensity: 0.085, opacity: 0.3 }, // Skillsへ
-  { t: 0.42, position: [-0.7, -0.3, 8.6], fogDensity: 0.105, opacity: 0.18 }, // Blog
-  { t: 0.68, position: [0.7, -0.5, 8.2], fogDensity: 0.105, opacity: 0.18 }, // About
-  { t: 1.0, position: [0, 0.1, 4.4], fogDensity: 0.05, opacity: 0.5 }, // Contact — 再収束
+  { t: 0.0, position: [1.6, 0.2, 5.4], fogDensity: 0.045, opacity: 0.95 },
+  { t: 0.18, position: [0.3, 0.5, 7.4], fogDensity: 0.085, opacity: 0.3 },
+  { t: 0.42, position: [-0.7, -0.3, 8.6], fogDensity: 0.105, opacity: 0.18 },
+  { t: 0.68, position: [0.7, -0.5, 8.2], fogDensity: 0.105, opacity: 0.18 },
+  { t: 1.0, position: [0, 0.1, 4.4], fogDensity: 0.05, opacity: 0.5 },
 ];
 
 function sampleKeyframes(t: number) {
@@ -166,8 +182,7 @@ function sampleKeyframes(t: number) {
 }
 
 function Rig({
-  basePositions,
-  edges,
+  network,
   nodeCount,
   pulseCount,
   groupRef,
@@ -180,8 +195,7 @@ function Rig({
   scrollProgressRef,
   pointerRef,
 }: {
-  basePositions: Float32Array;
-  edges: Edge[];
+  network: ReturnType<typeof buildNetwork>;
   nodeCount: number;
   pulseCount: number;
   groupRef: RefObject<THREE.Group | null>;
@@ -197,9 +211,9 @@ function Rig({
   const { scene } = useThree();
   const parallax = useRef({ x: 0, y: 0 });
 
-  const livePositions = useRef(new Float32Array(basePositions));
-  const linePositions = useRef(new Float32Array(edges.length * 6));
-  const pulses = useRef(createPulses(edges, pulseCount));
+  const livePositions = useRef(new Float32Array(network.basePositions));
+  const linePositions = useRef(new Float32Array(network.edges.length * 6));
+  const pulses = useRef(createPulses(network.edges, pulseCount));
   const pulsePositions = useRef(new Float32Array(pulseCount * 3));
 
   const raycaster = useRef(new THREE.Raycaster());
@@ -209,9 +223,11 @@ function Rig({
   const localMouse = useRef(new THREE.Vector3());
 
   useFrame((state, delta) => {
-    const { position, fogDensity, opacity } = sampleKeyframes(
-      scrollProgressRef.current,
-    );
+    const {
+      position,
+      fogDensity,
+      opacity: keyframeOpacity,
+    } = sampleKeyframes(scrollProgressRef.current);
 
     parallax.current.x = THREE.MathUtils.damp(
       parallax.current.x,
@@ -237,6 +253,13 @@ function Rig({
       scene.fog.density = fogDensity;
     }
 
+    const assemblyRaw = Math.min(
+      1,
+      state.clock.elapsedTime / ASSEMBLY_DURATION,
+    );
+    const assemblyT = easeOutCubic(assemblyRaw);
+    const assemblyFadeIn = Math.min(1, assemblyRaw / 0.6);
+
     if (pointerRef.current.active && groupRef.current) {
       pointerNDC.current.set(pointerRef.current.x, -pointerRef.current.y);
       raycaster.current.setFromCamera(pointerNDC.current, state.camera);
@@ -250,17 +273,24 @@ function Rig({
       }
     }
 
+    const base = network.basePositions;
+    const scatter = network.scatterPositions;
     const live = livePositions.current;
+
     for (let i = 0; i < nodeCount; i++) {
       const bi = i * 3;
-      let px = basePositions[bi];
-      let py = basePositions[bi + 1];
-      let pz = basePositions[bi + 2];
+      const tx = THREE.MathUtils.lerp(scatter[bi], base[bi], assemblyT);
+      const ty = THREE.MathUtils.lerp(scatter[bi + 1], base[bi + 1], assemblyT);
+      const tz = THREE.MathUtils.lerp(scatter[bi + 2], base[bi + 2], assemblyT);
+
+      let px = tx;
+      let py = ty;
+      let pz = tz;
 
       if (pointerRef.current.active) {
-        const dx = px - localMouse.current.x;
-        const dy = py - localMouse.current.y;
-        const dz = pz - localMouse.current.z;
+        const dx = tx - localMouse.current.x;
+        const dy = ty - localMouse.current.y;
+        const dz = tz - localMouse.current.z;
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (dist < REPULSION_RADIUS && dist > 0.0001) {
           const falloff = 1 - dist / REPULSION_RADIUS;
@@ -276,8 +306,8 @@ function Rig({
     }
 
     const lines = linePositions.current;
-    for (let e = 0; e < edges.length; e++) {
-      const [a, b] = edges[e];
+    for (let e = 0; e < network.edges.length; e++) {
+      const [a, b] = network.edges[e];
       const li = e * 6;
       lines[li] = live[a * 3];
       lines[li + 1] = live[a * 3 + 1];
@@ -287,14 +317,13 @@ function Rig({
       lines[li + 5] = live[b * 3 + 2];
     }
 
-    // 接続線の上を流れる光のパルス。ループするたびに別の辺へ乗り換える
     const pulsePos = pulsePositions.current;
     for (let p = 0; p < pulses.current.length; p++) {
       const pulse = pulses.current[p];
       pulse.t += delta * pulse.speed;
       if (pulse.t > 1) {
         pulse.t -= 1;
-        pulse.edge = randomEdge(edges);
+        pulse.edge = randomEdge(network.edges);
       }
       const [a, b] = pulse.edge;
       const ai = a * 3;
@@ -330,10 +359,14 @@ function Rig({
     }
 
     if (linesMaterialRef.current)
-      linesMaterialRef.current.opacity = opacity * 0.5;
-    if (pointsMaterialRef.current) pointsMaterialRef.current.opacity = opacity;
+      linesMaterialRef.current.opacity = keyframeOpacity * 0.5 * assemblyFadeIn;
+    if (pointsMaterialRef.current)
+      pointsMaterialRef.current.opacity = keyframeOpacity * assemblyFadeIn;
     if (pulsesMaterialRef.current)
-      pulsesMaterialRef.current.opacity = Math.min(1, opacity * 1.4);
+      pulsesMaterialRef.current.opacity = Math.min(
+        1,
+        keyframeOpacity * 1.4 * assemblyFadeIn,
+      );
 
     if (groupRef.current) {
       groupRef.current.rotation.y += delta * 0.025;
@@ -355,33 +388,16 @@ export function NetworkScene({
   const nodeCount = NODE_COUNT_BY_QUALITY[quality];
   const pulseCount = PULSE_COUNT_BY_QUALITY[quality];
   const nodeTexture = useMemo(() => createNodeTexture(), []);
-  const { basePositions, edges } = useMemo(
-    () => buildNetwork(nodeCount),
-    [nodeCount],
+  const network = useMemo(() => buildNetwork(nodeCount), [nodeCount]);
+
+  const initialNodePositions = useMemo(
+    () => new Float32Array(network.scatterPositions),
+    [network],
   );
-  const linePositions = useMemo(() => {
-    const array = new Float32Array(edges.length * 6);
-    for (let e = 0; e < edges.length; e++) {
-      const [a, b] = edges[e];
-      array.set(
-        [
-          basePositions[a * 3],
-          basePositions[a * 3 + 1],
-          basePositions[a * 3 + 2],
-        ],
-        e * 6,
-      );
-      array.set(
-        [
-          basePositions[b * 3],
-          basePositions[b * 3 + 1],
-          basePositions[b * 3 + 2],
-        ],
-        e * 6 + 3,
-      );
-    }
-    return array;
-  }, [basePositions, edges]);
+  const initialLinePositions = useMemo(
+    () => new Float32Array(network.edges.length * 6),
+    [network],
+  );
   const initialPulsePositions = useMemo(
     () => new Float32Array(pulseCount * 3),
     [pulseCount],
@@ -399,7 +415,7 @@ export function NetworkScene({
     <>
       <fogExp2 attach="fog" args={[BACKGROUND_COLOR, 0.06]} />
 
-      <group ref={groupRef}>
+      <group key={`group-${quality}`} ref={groupRef}>
         {POLYHEDRA.map((polyhedron, index) => (
           <SpinningPolyhedron key={index} {...polyhedron} />
         ))}
@@ -408,7 +424,7 @@ export function NetworkScene({
           <bufferGeometry ref={linesGeometryRef}>
             <bufferAttribute
               attach="attributes-position"
-              args={[linePositions, 3]}
+              args={[initialLinePositions, 3]}
             />
           </bufferGeometry>
           <lineBasicMaterial
@@ -423,7 +439,7 @@ export function NetworkScene({
           <bufferGeometry ref={pointsGeometryRef}>
             <bufferAttribute
               attach="attributes-position"
-              args={[basePositions, 3]}
+              args={[initialNodePositions, 3]}
             />
           </bufferGeometry>
           <pointsMaterial
@@ -459,8 +475,8 @@ export function NetworkScene({
       </group>
 
       <Rig
-        basePositions={basePositions}
-        edges={edges}
+        key={`rig-${quality}`}
+        network={network}
         nodeCount={nodeCount}
         pulseCount={pulseCount}
         groupRef={groupRef}
@@ -497,4 +513,10 @@ function createPulses(edges: Edge[], count: number): Pulse[] {
     t: Math.random(),
     speed: THREE.MathUtils.randFloat(0.25, 0.55),
   }));
+}
+
+const ASSEMBLY_DURATION = 1.6;
+
+function easeOutCubic(x: number): number {
+  return 1 - Math.pow(1 - x, 3);
 }
