@@ -11,7 +11,7 @@ type MenuProps = {
 
 export function Menu({ links, onNavigate }: MenuProps) {
   return (
-    <nav className="border-t border-border lg:hidden">
+    <nav className="border-t border-border lg:hidden bg-background fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-1 px-4 py-6 md:px-6">
         {links.map(({ href, label }) => (
           <Link
