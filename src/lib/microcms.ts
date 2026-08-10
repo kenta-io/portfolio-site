@@ -1,3 +1,11 @@
+import { requireEnv } from "@/lib/env";
+
+const MICROCMS_BASE_URL = `https://${requireEnv("MICROCMS_SERVICE_DOMAIN")}.microcms.io/api/v1`;
+
+function microcmsHeaders() {
+  return { "X-MICROCMS-API-KEY": requireEnv("MICROCMS_API_KEY") };
+}
+
 // ─── Skill ───
 export type SkillCategory =
   "コーディング" | "フロントエンド" | "バックエンド" | "ツール";
@@ -14,163 +22,17 @@ export type Skill = {
 };
 
 export async function getSkills(): Promise<Skill[]> {
-  return MOCK_SKILLS;
+  const res = await fetch(`${MICROCMS_BASE_URL}/skills?limit=100`, {
+    headers: microcmsHeaders(),
+  });
+  if (!res.ok) {
+    throw new Error(
+      `microCMS skills fetch failed: ${res.status} ${res.statusText}`,
+    );
+  }
+  const data = await res.json();
+  return data.contents;
 }
-
-const MOCK_SKILLS: Skill[] = [
-  {
-    id: "html-css",
-    name: "HTML/CSS",
-    category: "コーディング",
-    level: 88,
-    years: "3年",
-    description:
-      "現職での約3年の実務経験。サイト制作の中心となるマークアップ・スタイリング。",
-    featured: false,
-    order: 1,
-  },
-  {
-    id: "javascript",
-    name: "JavaScript",
-    category: "コーディング",
-    level: 85,
-    years: "3年",
-    description: "現職での約3年の実務経験。DOM操作からAPI連携まで幅広く使用。",
-    featured: false,
-    order: 2,
-  },
-  {
-    id: "php",
-    name: "PHP",
-    category: "コーディング",
-    level: 78,
-    years: "3年",
-    description: "WordPressサイトのカスタマイズ・保守運用で使用。",
-    featured: false,
-    order: 3,
-  },
-  {
-    id: "wordpress",
-    name: "WordPress",
-    category: "コーディング",
-    level: 80,
-    years: "3年",
-    description: "採用サイト・LP制作でのテーマカスタマイズ・運用保守。",
-    featured: false,
-    order: 4,
-  },
-  {
-    id: "react",
-    name: "React",
-    category: "フロントエンド",
-    level: 60,
-    years: "5ヶ月",
-    description:
-      "SES案件でのフロントエンド開発。コンポーネント設計・状態管理。",
-    featured: false,
-    order: 5,
-  },
-  {
-    id: "nextjs",
-    name: "Next.js",
-    category: "フロントエンド",
-    level: 55,
-    years: "5ヶ月",
-    description: "SES案件でApp Routerを用いたプロダクション開発を経験。",
-    featured: false,
-    order: 6,
-  },
-  {
-    id: "typescript-fe",
-    name: "TypeScript",
-    category: "フロントエンド",
-    level: 58,
-    years: "5ヶ月",
-    description: "SES案件のフロントエンド開発で型安全な実装を経験。",
-    featured: false,
-    order: 7,
-  },
-  {
-    id: "nestjs",
-    name: "Nest.js",
-    category: "バックエンド",
-    level: 50,
-    years: "5ヶ月",
-    description: "SES案件で予約関連サービスのバックエンド開発を担当。",
-    featured: false,
-    order: 8,
-  },
-  {
-    id: "typescript-be",
-    name: "TypeScript",
-    category: "バックエンド",
-    level: 52,
-    years: "5ヶ月",
-    description: "SES案件のバックエンド開発で型安全な実装を経験。",
-    featured: false,
-    order: 9,
-  },
-  {
-    id: "git",
-    name: "Git / GitHub",
-    category: "ツール",
-    level: 82,
-    years: "日常使用",
-    description: "ブランチ運用・コードレビュー等、日常的な開発フローで使用。",
-    featured: false,
-    order: 10,
-  },
-  {
-    id: "figma",
-    name: "Figma",
-    category: "ツール",
-    level: 78,
-    years: "日常使用",
-    description: "デザインのコード化・仕様確認で日常的に使用。",
-    featured: false,
-    order: 11,
-  },
-  {
-    id: "claude-code",
-    name: "Claude Code",
-    category: "ツール",
-    level: 80,
-    years: "日常使用",
-    description: "実装支援・デザインのソースコード化・学習効率化に活用。",
-    featured: true,
-    order: 12,
-  },
-  {
-    id: "slack",
-    name: "Slack",
-    category: "ツール",
-    level: 75,
-    years: "日常使用",
-    description: "社内外とのコミュニケーションで日常的に使用。",
-    featured: false,
-    order: 13,
-  },
-  {
-    id: "adobe",
-    name: "Adobe",
-    category: "ツール",
-    level: 65,
-    years: "日常使用",
-    description: "画像・素材の調整等で使用。",
-    featured: false,
-    order: 14,
-  },
-  {
-    id: "asana",
-    name: "Asana",
-    category: "ツール",
-    level: 70,
-    years: "日常使用",
-    description: "タスク・進行管理で使用。",
-    featured: false,
-    order: 15,
-  },
-];
 
 // ─── Blog ───
 export type BlogCategory =
@@ -191,35 +53,13 @@ export type BlogPost = {
   publishedAt: string;
 };
 
-const MOCK_BLOG_POSTS: BlogPost[] = [
-  {
-    id: "nextjs-app-router-data-fetching",
-    title: "Next.js App Routerでのデータ取得パターンを整理する",
-    excerpt:
-      "Server ComponentとServer Actionsを使い分けながら、データ取得・再検証の設計をどう考えるかまとめました。",
-    category: "Next.js",
-    publishedAt: "2026-07-15",
-    body: "本文はダミーのプレーンテキストでよい（マークダウン化は7節で行う）。",
-  },
-  {
-    id: "react-custom-hooks",
-    title: "Reactのカスタムフックでロジックを再利用する",
-    excerpt:
-      "フォームや非同期処理まわりで重複しがちなロジックを、カスタムフックとして切り出す際に気をつけていることを整理します。",
-    category: "React",
-    publishedAt: "2026-06-28",
-    body: "本文はダミーのプレーンテキストでよい。",
-  },
-  {
-    id: "typescript-type-guard",
-    title: "TypeScriptの型ガードで実行時の値を安全に絞り込む",
-    excerpt:
-      "外部APIやフォーム入力など、型が保証されない値をzod等でどう検証し、型ガードとして活用するかを実例と共に説明します。",
-    category: "TypeScript",
-    publishedAt: "2026-06-10",
-    body: "本文はダミーのプレーンテキストでよい。",
-  },
-];
+type MicrocmsBlogPost = Omit<BlogPost, "category"> & {
+  category: { id: string; name: string };
+};
+
+function toBlogPost(raw: MicrocmsBlogPost): BlogPost {
+  return { ...raw, category: raw.category.name as BlogCategory };
+}
 
 export async function getBlogPosts({
   category,
@@ -230,19 +70,23 @@ export async function getBlogPosts({
   page?: number;
   limit?: number;
 } = {}) {
-  const filtered = category
-    ? MOCK_BLOG_POSTS.filter((post) => post.category === category)
-    : MOCK_BLOG_POSTS;
-  const sorted = [...filtered].sort((a, b) =>
-    a.publishedAt < b.publishedAt ? 1 : -1,
+  const filters = category
+    ? `&filters=category[equals]${categoryToSlug(category)}`
+    : "";
+  const res = await fetch(
+    `${MICROCMS_BASE_URL}/blog?limit=${limit}&offset=${(page - 1) * limit}${filters}`,
+    { headers: microcmsHeaders() },
   );
-  const totalPages = Math.max(1, Math.ceil(sorted.length / limit));
-  const start = (page - 1) * limit;
-
+  if (!res.ok) {
+    throw new Error(
+      `microCMS blog fetch failed: ${res.status} ${res.statusText}`,
+    );
+  }
+  const data = await res.json();
   return {
-    posts: sorted.slice(start, start + limit),
-    totalPages,
-    total: sorted.length,
+    posts: (data.contents as MicrocmsBlogPost[]).map(toBlogPost),
+    totalPages: Math.max(1, Math.ceil(data.totalCount / limit)),
+    total: data.totalCount,
   };
 }
 
@@ -267,15 +111,26 @@ export function slugToCategory(slug: string): BlogCategory | undefined {
 }
 
 export async function getFeaturedBlogPost(): Promise<BlogPost | null> {
-  const sorted = [...MOCK_BLOG_POSTS].sort((a, b) =>
-    a.publishedAt < b.publishedAt ? 1 : -1,
-  );
-
-  return sorted[0] ?? null;
+  const res = await fetch(`${MICROCMS_BASE_URL}/blog?limit=1`, {
+    headers: microcmsHeaders(),
+  });
+  if (!res.ok) {
+    throw new Error(
+      `microCMS blog fetch failed: ${res.status} ${res.statusText}`,
+    );
+  }
+  const data = await res.json();
+  const raw: MicrocmsBlogPost | undefined = data.contents[0];
+  return raw ? toBlogPost(raw) : null;
 }
 
 export async function getBlogPost(id: string): Promise<BlogPost | null> {
-  return MOCK_BLOG_POSTS.find((post) => post.id === id) ?? null;
+  const res = await fetch(`${MICROCMS_BASE_URL}/blog/${id}`, {
+    headers: microcmsHeaders(),
+  });
+  if (!res.ok) return null;
+  const raw: MicrocmsBlogPost = await res.json();
+  return toBlogPost(raw);
 }
 
 export function calculateReadTime(body: string): number {
