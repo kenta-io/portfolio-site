@@ -87,7 +87,7 @@ export async function BlogListView({ categorySlug, page }: BlogListViewProps) {
 async function getCategoryCounts(): Promise<Record<string, number>> {
   const entries = await Promise.all(
     ALL_CATEGORIES.map(async (category) => {
-      const { total } = await getBlogPosts({ category, limit: 9999 });
+      const { total } = await getBlogPosts({ category, limit: 100 });
 
       return [category, total] as const;
     }),
