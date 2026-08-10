@@ -15,7 +15,7 @@ type BlogPageProps = {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category } = await searchParams;
-  const { posts, total } = await getBlogPosts({ limit: 9999 });
+  const { posts, total } = await getBlogPosts({ limit: 100 });
   const startedYear = Math.min(
     ...posts.map((post) => new Date(post.publishedAt).getFullYear()),
   );
