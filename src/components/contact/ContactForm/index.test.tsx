@@ -1,7 +1,14 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ContactForm } from "@/components/contact/ContactForm";
+
+vi.mock("@marsidev/react-turnstile", () => ({
+  Turnstile: ({ onSuccess }: { onSuccess?: (token: string) => void }) => {
+    onSuccess?.("test-turnstile-token");
+    return null;
+  },
+}));
 
 describe("ContactForm", () => {
   it("shows a validation error when submitting with a blank required field", async () => {
