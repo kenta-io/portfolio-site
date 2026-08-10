@@ -62,11 +62,18 @@ export async function BlogListView({ categorySlug, page }: BlogListViewProps) {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-        {restPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+      {restPosts.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          {restPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
+          <LuBookOpen size={28} />
+          <p className="text-sm">該当する記事はありません</p>
+        </div>
+      )}
 
       <Pagination
         currentPage={page}
