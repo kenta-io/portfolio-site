@@ -49,17 +49,21 @@ export async function SkillsPreview() {
                 <div className="font-heading mb-4 text-xs uppercase tracking-[0.28em] text-accent md:mb-5">
                   {category}
                 </div>
-                <ul className="space-y-2.5">
-                  {items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-2.5 text-sm"
-                    >
-                      <span className="h-1 w-1 flex-shrink-0 rounded-full bg-accent" />
-                      {item.name}
-                    </li>
-                  ))}
-                </ul>
+                {items.length > 0 ? (
+                  <ul className="space-y-2.5">
+                    {items.map((item) => (
+                      <li
+                        key={item.id}
+                        className="flex items-center gap-2.5 text-sm"
+                      >
+                        <span className="h-1 w-1 flex-shrink-0 rounded-full bg-accent" />
+                        {item.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">準備中</p>
+                )}
               </div>
             );
           })}
