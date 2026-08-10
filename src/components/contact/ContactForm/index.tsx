@@ -20,6 +20,7 @@ import {
   LuMail,
   LuMessageSquare,
 } from "react-icons/lu";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 type Step = "input" | "confirm" | "complete";
 
@@ -32,6 +33,7 @@ const INQUIRY_ICONS: Record<string, IconType> = {
 
 export function ContactForm() {
   const [step, setStep] = useState<Step>("input");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [confirmedValues, setConfirmedValues] =
     useState<ContactFormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +60,10 @@ export function ContactForm() {
         onBack={() => setStep("input")}
         onConfirm={async () => {
           setIsSubmitting(true);
-          const result = await sendContactEmail(confirmedValues);
+          const result = await sendContactEmail(
+            confirmedValues,
+            turnstileToken!,
+          );
           setIsSubmitting(false);
           if (result.status === "success") {
             setStep("complete");
@@ -158,9 +163,11 @@ export function ContactForm() {
         />
       </Field>
 
-      <div className="font-heading flex items-center justify-center border border-border py-6 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-        [ Cloudflare Turnstile — 本番実装時に設置 ]
-      </div>
+      <Turnstile
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        onSuccess={setTurnstileToken}
+        onExpire={() => setTurnstileToken(null)}
+      />
 
       <label className="flex items-start gap-2.5 text-xs text-muted-foreground">
         <input
@@ -184,7 +191,8 @@ export function ContactForm() {
 
       <button
         type="submit"
-        className="font-heading w-full bg-accent py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-opacity hover:opacity-85 md:py-4"
+        disabled={!turnstileToken}
+        className="font-heading w-full bg-accent py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40 md:py-4"
       >
         確認画面へ進む
       </button>
