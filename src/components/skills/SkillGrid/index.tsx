@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import clsx from "clsx";
+import { LuLayers } from "react-icons/lu";
 import type { Skill, SkillCategory } from "@/lib/microcms";
 import { SkillCard } from "@/components/skills/SkillCard";
 
@@ -57,11 +58,18 @@ export function SkillGrid({ skills }: SkillGridProps) {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
-        {filtered.map((skill) => (
-          <SkillCard key={skill.id} skill={skill} />
-        ))}
-      </div>
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
+          {filtered.map((skill) => (
+            <SkillCard key={skill.id} skill={skill} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
+          <LuLayers size={28} />
+          <p className="text-sm">該当するスキルはありません</p>
+        </div>
+      )}
     </div>
   );
 }
