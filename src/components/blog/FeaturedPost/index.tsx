@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { LuImage } from "react-icons/lu";
 import { calculateReadTime, type BlogPost } from "@/lib/microcms";
 
 type FeaturedPostProps = {
@@ -9,7 +11,17 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
   return (
     <article className="grid grid-cols-1 border border-border bg-card lg:grid-cols-[480px_1fr]">
       <div className="relative flex min-h-[200px] items-center justify-center overflow-hidden bg-background lg:border-r lg:border-border">
-        <span className="font-heading relative bg-accent/10 px-2.5 py-1 text-xs uppercase tracking-[0.28em] text-accent">
+        {post.thumbnail ? (
+          <Image
+            src={post.thumbnail.url}
+            alt={post.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <LuImage size={40} className="text-muted-foreground" />
+        )}
+        <span className="font-heading absolute left-4 top-4 z-10 bg-accent/10 px-2.5 py-1 text-xs uppercase tracking-[0.28em] text-accent backdrop-blur-sm">
           Featured
         </span>
       </div>

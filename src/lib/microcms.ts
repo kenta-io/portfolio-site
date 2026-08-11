@@ -49,6 +49,7 @@ export type BlogPost = {
   title: string;
   excerpt: string;
   category: BlogCategory;
+  thumbnail: { url: string; width: number; height: number } | null;
   body: string;
   publishedAt: string;
 };
@@ -58,7 +59,11 @@ type MicrocmsBlogPost = Omit<BlogPost, "category"> & {
 };
 
 function toBlogPost(raw: MicrocmsBlogPost): BlogPost {
-  return { ...raw, category: raw.category.name as BlogCategory };
+  return {
+    ...raw,
+    category: raw.category.name as BlogCategory,
+    thumbnail: raw.thumbnail ?? null,
+  };
 }
 
 export async function getBlogPosts({
