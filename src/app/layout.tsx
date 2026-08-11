@@ -3,6 +3,8 @@ import { Oxanium, Mulish } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { requireEnv } from "@/lib/env";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-oxanium" });
 const mulish = Mulish({ subsets: ["latin"], variable: "--font-mulish" });
@@ -18,6 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${oxanium.variable} ${mulish.variable} h-full antialiased`}
     >
+      <GoogleTagManager gtmId={requireEnv("GTM_CONTAINER_ID")} />
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
