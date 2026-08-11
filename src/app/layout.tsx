@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: { default: "知念健太 Portfolio", template: "%s | 知念健太 Portfolio" },
   robots: { index: false, follow: false },
   metadataBase: new URL(requireEnv("NEXT_PUBLIC_SITE_URL")),
+  alternates: { canonical: "/" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

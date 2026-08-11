@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
+
+export const metadata: Metadata = {
+  title: "プライバシーポリシー",
+  description: "本サイトの個人情報の取り扱いについて説明しています。",
+  alternates: { canonical: "/privacy-policy" },
+};
 
 const SECTIONS = [
   {

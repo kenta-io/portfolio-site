@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SiGithub } from "react-icons/si";
 import { Interests } from "@/components/about/Interests";
 import { Philosophy } from "@/components/about/Philosophy";
@@ -5,6 +6,13 @@ import { Portrait } from "@/components/about/Portrait";
 import { TimelineItem } from "@/components/about/TimelineItem";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "知念健太の経歴・スキルセットを紹介するページです。陸上自衛隊や海外就労、異業種でのキャリア経験などを経て、プログラミングスクールでWeb制作のスキルを身につけ、現在はHR支援会社でコーダーとして活動しています。",
+  alternates: { canonical: "/about" },
+};
 
 const QUICK_FACTS = [
   { label: "Location", value: "東京都, 日本" },

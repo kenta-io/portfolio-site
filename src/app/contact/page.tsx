@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactSidebar } from "@/components/contact/ContactSidebar";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
+
+export const metadata: Metadata = {
+  title: "お問い合わせ",
+  description:
+    "知念健太へのお問い合わせはこちらから。採用担当の方からのご連絡もお気軽にどうぞ。",
+  alternates: { canonical: "/contact" },
+};
 
 const FAQ_ITEMS = [
   {
