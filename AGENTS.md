@@ -207,3 +207,13 @@ Huskyのpre-commitフックにテスト実行を含めるかは実行時間次�
 - ページを実装したら、必ずブラウザで実際にクリックして全リンクを踏む（本文中のリンク、フッター、ヘッダーのナビゲーション等）。型チェックは見た目・リンク切れのバグを検出できない
 - PC・タブレット・モバイルの各幅で見た目を目視確認する（画像の縦横比が崩れていないか等）
 - 各ページを実装し終えたら、仕様書と見比べて表示項目に漏れがないか確認する（特にリスト・カード表示は表示項目を絞りすぎたり多すぎたりしやすい）
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
