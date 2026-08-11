@@ -3,6 +3,7 @@ import { INQUIRY_TYPES, type ContactFormValues } from "@/lib/contactSchema";
 type ConfirmStepProps = {
   values: ContactFormValues;
   isSubmitting: boolean;
+  error: string | null;
   onBack: () => void;
   onConfirm: () => void;
 };
@@ -10,6 +11,7 @@ type ConfirmStepProps = {
 export function ConfirmStep({
   values,
   isSubmitting,
+  error,
   onBack,
   onConfirm,
 }: ConfirmStepProps) {
@@ -43,6 +45,12 @@ export function ConfirmStep({
           </div>
         ))}
       </dl>
+
+      {error && (
+        <p className="text-sm text-red-400" role="alert">
+          {error}
+        </p>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button

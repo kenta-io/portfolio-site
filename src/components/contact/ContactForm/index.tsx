@@ -37,6 +37,7 @@ export function ContactForm() {
   const [confirmedValues, setConfirmedValues] =
     useState<ContactFormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -57,9 +58,11 @@ export function ContactForm() {
       <ConfirmStep
         values={confirmedValues}
         isSubmitting={isSubmitting}
+        error={submitError}
         onBack={() => setStep("input")}
         onConfirm={async () => {
           setIsSubmitting(true);
+          setSubmitError(null);
           const result = await sendContactEmail(
             confirmedValues,
             turnstileToken!,
@@ -67,6 +70,8 @@ export function ContactForm() {
           setIsSubmitting(false);
           if (result.status === "success") {
             setStep("complete");
+          } else {
+            setSubmitError(result.message);
           }
         }}
       />

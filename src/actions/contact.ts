@@ -20,7 +20,6 @@ async function verifyTurnstileToken(token: string): Promise<boolean> {
     },
   );
   const data = await res.json();
-  console.error("[DEBUG turnstile siteverify response]", JSON.stringify(data));
   return data.success === true;
 }
 
