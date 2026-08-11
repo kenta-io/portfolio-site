@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Skills",
   description:
     "知念健太の技術スタックを紹介するページです。コーディング（HTML/CSS/JavaScript/PHP/WordPress）、フロントエンド（React/Next.js/TypeScript）、バックエンド（Nest.js）、学習中のThree.js/WebGLまで。",
+  alternates: { canonical: "/skills" },
 };
 
 export default async function SkillsPage() {

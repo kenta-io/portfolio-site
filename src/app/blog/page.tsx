@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "ブログ",
   description:
     "知念健太が技術的な学びや制作について書いているブログです。React / Next.js / TypeScriptなどの技術記事を中心に発信しています。",
+  alternates: { canonical: "/blog" },
 };
 
 type BlogPageProps = {

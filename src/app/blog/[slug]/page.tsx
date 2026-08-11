@@ -15,7 +15,11 @@ export async function generateMetadata({
   const post = await getBlogPost(slug);
   if (!post) return { title: "記事が見つかりません" };
 
-  return { title: post.title, description: post.excerpt };
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
+  };
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
