@@ -15,16 +15,18 @@ export function CompleteStep({ onReset }: CompleteStepProps) {
         <p className="text-sm leading-relaxed text-muted-foreground">
           入力内容を確認しました。
           <br />
-          ※本サイトはポートフォリオのため、実際のメール送信は行われません。
-          <br />
-          ご連絡は
-          <a
-            href="mailto:kkeenn.chinen@gmail.com"
-            className="text-accent hover:opacity-80"
-          >
-            kkeenn.chinen@gmail.com
-          </a>
-          まで直接お願いいたします。
+          <span className="text-red-400">
+            ※本サイトはポートフォリオのため、実際のメール送信は行われません。
+            <br />
+            ご連絡は「
+            <a
+              href="mailto:kkeenn.chinen@gmail.com"
+              className="text-accent hover:opacity-80"
+            >
+              kkeenn.chinen@gmail.com
+            </a>
+            」まで直接お願いいたします。
+          </span>
         </p>
       </div>
       <button

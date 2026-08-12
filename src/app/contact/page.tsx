@@ -82,7 +82,7 @@ export default function ContactPage() {
                   メッセージを送る
                 </h2>
               </div>
-              <p className="mb-6 border border-accent/25 bg-accent/[0.06] p-4 text-xs leading-relaxed text-muted-foreground md:mb-8">
+              <p className="mb-6 border border-red-400/25 bg-red-400/[0.06] p-4 text-xs leading-relaxed text-red-400 md:mb-8">
                 ※本サイトはポートフォリオのため、送信フォームは実際にはメールを送信しないデモ動作です。実際のご連絡は
                 <a
                   href="mailto:kkeenn.chinen@gmail.com"
