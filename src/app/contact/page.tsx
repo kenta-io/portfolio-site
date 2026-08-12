@@ -82,6 +82,16 @@ export default function ContactPage() {
                   メッセージを送る
                 </h2>
               </div>
+              <p className="mb-6 border border-accent/25 bg-accent/[0.06] p-4 text-xs leading-relaxed text-muted-foreground md:mb-8">
+                ※本サイトはポートフォリオのため、送信フォームは実際にはメールを送信しないデモ動作です。実際のご連絡は
+                <a
+                  href="mailto:kkeenn.chinen@gmail.com"
+                  className="text-accent hover:opacity-80"
+                >
+                  kkeenn.chinen@gmail.com
+                </a>
+                までお願いいたします。
+              </p>
               <ContactForm />
             </div>
 

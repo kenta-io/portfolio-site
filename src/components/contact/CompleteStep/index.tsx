@@ -13,9 +13,18 @@ export function CompleteStep({ onReset }: CompleteStepProps) {
           送信完了しました
         </h3>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          メッセージを受け取りました。
+          入力内容を確認しました。
           <br />
-          通常24時間以内にご返信いたします。
+          ※本サイトはポートフォリオのため、実際のメール送信は行われません。
+          <br />
+          ご連絡は
+          <a
+            href="mailto:kkeenn.chinen@gmail.com"
+            className="text-accent hover:opacity-80"
+          >
+            kkeenn.chinen@gmail.com
+          </a>
+          まで直接お願いいたします。
         </p>
       </div>
       <button
