@@ -2,7 +2,6 @@
 
 import { ContactFormValues, contactSchema } from "@/lib/contactSchema";
 import { requireEnv } from "@/lib/env";
-import { sendConfirmationEmail, sendNotificationEmail } from "@/lib/resend";
 
 export type SendContactResult =
   { status: "success" } | { status: "error"; message: string };
@@ -37,22 +36,6 @@ export async function sendContactEmail(
     return {
       status: "error",
       message: "確認に失敗しました。もう一度お試しください。",
-    };
-  }
-
-  const notifySucceeded = await sendNotificationEmail(parsed.data);
-  if (!notifySucceeded) {
-    return {
-      status: "error",
-      message: "送信に失敗しました。時間をおいて再度お試しください。",
-    };
-  }
-
-  const confirmSucceeded = await sendConfirmationEmail(parsed.data);
-  if (!confirmSucceeded) {
-    return {
-      status: "error",
-      message: "送信に失敗しました。時間をおいて再度お試しください。",
     };
   }
 
