@@ -17,7 +17,7 @@ const CORE_STRENGTHS = [
   {
     name: "React / Next.js / TypeScript",
     since: "2025",
-    level: 60,
+    level: 40,
     description:
       "SES案件でのフロントエンド開発経験。コンポーネント設計から型安全な実装まで対応。",
     highlights: [
@@ -30,7 +30,7 @@ const CORE_STRENGTHS = [
   {
     name: "AI活用（Claude Code）",
     since: "2025",
-    level: 80,
+    level: 60,
     description:
       "実装支援・デザインのソースコード化・学習効率化にClaude Codeを活用しています。",
     highlights: [
