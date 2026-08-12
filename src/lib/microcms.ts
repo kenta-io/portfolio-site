@@ -13,7 +13,7 @@ export type SkillCategory =
 export type Skill = {
   id: string;
   name: string;
-  category: SkillCategory;
+  category: SkillCategory[];
   years: string;
   level: number;
   description: string;

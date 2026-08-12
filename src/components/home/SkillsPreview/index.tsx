@@ -39,7 +39,9 @@ export async function SkillsPreview() {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {CATEGORY_ORDER.map((category) => {
-            const items = skills.filter((skill) => skill.category === category);
+            const items = skills.filter((skill) =>
+              skill.category.includes(category),
+            );
 
             return (
               <div
