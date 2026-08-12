@@ -25,7 +25,7 @@ export function SkillGrid({ skills }: SkillGridProps) {
   const filtered =
     activeCategory === "All"
       ? skills
-      : skills.filter((skill) => skill.category === activeCategory);
+      : skills.filter((skill) => skill.category.includes(activeCategory));
 
   return (
     <div>
@@ -35,7 +35,8 @@ export function SkillGrid({ skills }: SkillGridProps) {
           const count =
             category === "All"
               ? skills.length
-              : skills.filter((skill) => skill.category === category).length;
+              : skills.filter((skill) => skill.category.includes(category))
+                  .length;
 
           return (
             <button

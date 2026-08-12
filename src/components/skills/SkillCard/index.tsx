@@ -43,7 +43,7 @@ export function SkillCard({ skill }: SkillCardProps) {
       </p>
 
       <div className="font-heading mt-auto text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-        {skill.category}
+        {skill.category[0]}
       </div>
     </div>
   );
