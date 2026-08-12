@@ -33,7 +33,6 @@ src/
 ├── lib/
 │   ├── microcms.ts   # microCMSクライアント・型定義・取得関数
 │   ├── env.ts         # requireEnv()（環境変数の一律検証）
-│   ├── resend.ts       # メール送信処理
 │   └── markdown.ts      # remark/rehypeパイプライン（Shikiハイライト等）
 │
 ├── actions/    # Server Actions
@@ -114,7 +113,7 @@ return { status: "success" };
 
 ## 環境変数
 
-`process.env.X`を直接書かず、必ず共通関数`requireEnv()`を経由する。一部のサービスだけ検証されている状態を避けるため、使う外部サービス全て（microCMS、Resend、Turnstile、Basic認証）に一律で適用する。
+`process.env.X`を直接書かず、必ず共通関数`requireEnv()`を経由する。一部のサービスだけ検証されている状態を避けるため、使う外部サービス全て（microCMS、Turnstile、Basic認証）に一律で適用する。
 
 ```ts
 // lib/env.ts
