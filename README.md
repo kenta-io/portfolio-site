@@ -4,6 +4,12 @@ React / Next.js / TypeScriptでの開発実績を紹介するポートフォリ�
 
 **Live**: https://portfolio-site-nine-coral-57.vercel.app/ （Basic認証で保護されています）
 
+**Basic認証**:
+
+**Id**: admin
+
+**Password**: admin1234
+
 ## 概要
 
 - 転職活動用に作成した個人のポートフォリオサイトです
